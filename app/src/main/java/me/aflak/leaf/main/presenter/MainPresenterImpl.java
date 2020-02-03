@@ -74,10 +74,13 @@ public class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void onHelloWorld() {
-        String s = "ABC";
-        byte[] buff = ByteBuffer.allocate(s.length() + 4).putInt(s.length()).put(s.getBytes()).array();
-        System.out.println(Arrays.toString(buff));
-        arduino.send(buff);
+        String s = "Hello World";
+        int length = s.length();
+        byte[] data = new byte[2 + length];
+        data[0] = (byte) length;
+        data[1] = (byte) (length >>> 8);
+        System.arraycopy(s.getBytes(), 0, data, 2, length);
+        arduino.send(data);
         view.appendChatMessage("-> " + s);
     }
 }
