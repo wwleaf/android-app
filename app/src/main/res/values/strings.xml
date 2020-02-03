@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Leaf</string>
+
+    <string name="connection_connect_text">Plug Leaf to your Android</string>
+    <string name="connection_connect_button">Connect</string>
+</resources>
