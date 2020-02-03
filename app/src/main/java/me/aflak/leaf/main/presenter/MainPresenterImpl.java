@@ -3,18 +3,26 @@ package me.aflak.leaf.main.presenter;
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
 
+import javax.inject.Inject;
+
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
 import me.aflak.leaf.arduino.Utils;
+import me.aflak.leaf.graph.GraphService;
+import me.aflak.leaf.main.interactor.MainInteractor;
 import me.aflak.leaf.main.view.MainView;
 
 public class MainPresenterImpl implements MainPresenter {
     private MainView view;
+    private MainInteractor interactor;
     private Arduino arduino;
     private UsbDevice device;
 
-    public MainPresenterImpl(MainView view) {
+    @Inject GraphService service;
+
+    public MainPresenterImpl(MainView view, MainInteractor interactor) {
         this.view = view;
+        this.interactor = interactor;
     }
 
     @Override
@@ -44,6 +52,7 @@ public class MainPresenterImpl implements MainPresenter {
             @Override
             public void onArduinoMessage(byte[] bytes) {
                 String message = new String(bytes);
+                interactor.processMessage(message);
                 view.appendChatMessage("<- " + message);
             }
 
