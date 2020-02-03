@@ -3,9 +3,6 @@ package me.aflak.leaf.main.presenter;
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
 import me.aflak.leaf.main.view.MainView;
@@ -72,15 +69,20 @@ public class MainPresenterImpl implements MainPresenter {
         arduino.open(device);
     }
 
-    @Override
-    public void onHelloWorld() {
-        String s = "Hello World";
-        int length = s.length();
+    private byte[] formatArduinoMessage(String message) {
+        int length = message.length();
         byte[] data = new byte[2 + length];
         data[0] = (byte) length;
         data[1] = (byte) (length >>> 8);
-        System.arraycopy(s.getBytes(), 0, data, 2, length);
+        System.arraycopy(message.getBytes(), 0, data, 2, length);
+        return data;
+    }
+
+    @Override
+    public void onHelloWorld() {
+        String message = "Hello World";
+        byte[] data = formatArduinoMessage(message);
         arduino.send(data);
-        view.appendChatMessage("-> " + s);
+        view.appendChatMessage("-> " + message);
     }
 }
