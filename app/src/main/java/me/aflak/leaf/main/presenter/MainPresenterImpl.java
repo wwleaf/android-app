@@ -5,6 +5,7 @@ import android.hardware.usb.UsbDevice;
 
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
+import me.aflak.leaf.arduino.Utils;
 import me.aflak.leaf.main.view.MainView;
 
 public class MainPresenterImpl implements MainPresenter {
@@ -69,19 +70,10 @@ public class MainPresenterImpl implements MainPresenter {
         arduino.open(device);
     }
 
-    private byte[] formatArduinoMessage(String message) {
-        int length = message.length();
-        byte[] data = new byte[2 + length];
-        data[0] = (byte) length;
-        data[1] = (byte) (length >>> 8);
-        System.arraycopy(message.getBytes(), 0, data, 2, length);
-        return data;
-    }
-
     @Override
     public void onHelloWorld() {
         String message = "Hello World";
-        byte[] data = formatArduinoMessage(message);
+        byte[] data = Utils.formatArduinoMessage(message);
         arduino.send(data);
         view.appendChatMessage("-> " + message);
     }
