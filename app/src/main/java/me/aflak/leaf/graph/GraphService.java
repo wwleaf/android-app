@@ -1,6 +1,5 @@
 package me.aflak.leaf.graph;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Pair;
 
@@ -69,7 +68,9 @@ public class GraphService {
 
     public void load(List<Pair<Node, Node>> edges) {
         for (Pair<Node, Node> pair : edges) {
-            graph.addEdge(pair.first, pair.second);
+            if (!graph.containsEdge(pair.first, pair.second)) {
+                graph.addEdge(pair.first, pair.second);
+            }
         }
     }
 
@@ -79,5 +80,9 @@ public class GraphService {
             edges.add(Pair.create(graph.getEdgeSource(e), graph.getEdgeTarget(e)));
         }
         return edges;
+    }
+
+    public List<Node> getNodes() {
+        return new ArrayList<>(graph.vertexSet());
     }
 }

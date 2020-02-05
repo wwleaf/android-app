@@ -5,6 +5,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ public class ChatFragment extends Fragment {
     private OnChatListener listener;
 
     @BindView(R.id.chat_text) TextView chat;
+    @BindView(R.id.chat_input) EditText editText;
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -31,10 +33,11 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
-    @OnClick(R.id.chat_hello)
-    public void onHelloWorld() {
+    @OnClick(R.id.chat_send)
+    public void onSendMessage() {
         if (listener != null) {
-            listener.onHelloWorld();
+            String message = editText.getText().toString();
+            listener.onMessage(message);
         }
     }
 
@@ -48,6 +51,6 @@ public class ChatFragment extends Fragment {
     }
 
     interface OnChatListener {
-        void onHelloWorld();
+        void onMessage(String message);
     }
 }

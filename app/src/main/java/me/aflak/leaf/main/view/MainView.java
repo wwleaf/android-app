@@ -1,5 +1,7 @@
 package me.aflak.leaf.main.view;
 
+import java.util.List;
+
 public interface MainView {
     void showConnectedIcon();
     void showDisconnectedIcon();
@@ -9,4 +11,5 @@ public interface MainView {
     void showChat();
     void hideChat();
     void appendChatMessage(String message);
+    void showUsers(List<Integer> users);
 }

@@ -2,6 +2,9 @@ package me.aflak.leaf.main.presenter;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
+import android.util.Pair;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -9,7 +12,9 @@ import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
 import me.aflak.leaf.arduino.Utils;
 import me.aflak.leaf.graph.GraphService;
+import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.interactor.MainInteractor;
+import me.aflak.leaf.main.interactor.MainInteractorImpl;
 import me.aflak.leaf.main.view.MainView;
 
 public class MainPresenterImpl implements MainPresenter {
@@ -23,6 +28,7 @@ public class MainPresenterImpl implements MainPresenter {
     public MainPresenterImpl(MainView view, MainInteractor interactor) {
         this.view = view;
         this.interactor = interactor;
+        interactor.setOnGraphListener(onGraphListener);
     }
 
     @Override
@@ -80,10 +86,16 @@ public class MainPresenterImpl implements MainPresenter {
     }
 
     @Override
-    public void onHelloWorld() {
-        String message = "Hello World";
+    public void onMessage(String message) {
         byte[] data = Utils.formatArduinoMessage(message);
         arduino.send(data);
         view.appendChatMessage("-> " + message);
     }
+
+    private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {
+        @Override
+        public void onGraphChanged(List<Node> nodes) {
+//            view.showUsers(nodes.stream().map(node -> Integer.valueOf(node.getId())));
+        }
+    };
 }

@@ -7,5 +7,5 @@ public interface MainPresenter {
     void onStart();
     void onDestroy();
     void onConnectClicked();
-    void onHelloWorld();
+    void onMessage(String message);
 }

@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -111,7 +113,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
         chatFragment.appendMessage(message);
     }
 
-    private ChatFragment.OnChatListener chatListener = () -> {
-        presenter.onHelloWorld();
-    };
+    @Override
+    public void showUsers(List<Integer> users) {
+
+    }
+
+    private ChatFragment.OnChatListener chatListener = (message) -> presenter.onMessage(message);
 }
