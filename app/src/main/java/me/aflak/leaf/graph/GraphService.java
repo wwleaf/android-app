@@ -28,16 +28,6 @@ public class GraphService {
         this.graph = new DefaultUndirectedGraph<>(DefaultEdge.class);
     }
 
-    public void update(GraphService graphService) {
-        for (DefaultEdge edge : graphService.graph.edgeSet()) {
-            graph.addEdge(graphService.graph.getEdgeSource(edge), graphService.graph.getEdgeTarget(edge));
-        }
-    }
-
-    public void connect(Node a, Node b) {
-        graph.addEdge(a, b);
-    }
-
     public List<Node> shortestPath(Node from, Node to) {
         GraphPath<Node, DefaultEdge> path = DijkstraShortestPath.findPathBetween(graph, from, to);
         List<Node> nodes = new ArrayList<>();

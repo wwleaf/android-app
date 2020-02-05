@@ -81,6 +81,7 @@ public class MainPresenterImpl implements MainPresenter {
     @Override
     public void onDestroy() {
         interactor.stopTimer();
+        interactor.saveGraph();
         arduino.unsetArduinoListener();
         arduino.close();
     }

@@ -76,6 +76,11 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     @Override
+    public void saveGraph() {
+        graphService.save();
+    }
+
+    @Override
     public void setOnGraphListener(OnGraphListener listener) {
         this.listener = listener;
     }
