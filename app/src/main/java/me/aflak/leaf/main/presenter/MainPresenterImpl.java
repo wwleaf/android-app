@@ -4,6 +4,8 @@ import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.util.Pair;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,14 +30,16 @@ public class MainPresenterImpl implements MainPresenter {
     public MainPresenterImpl(MainView view, MainInteractor interactor) {
         this.view = view;
         this.interactor = interactor;
-        interactor.setOnGraphListener(onGraphListener);
     }
 
     @Override
     public void onCreate(Context context) {
-        arduino = new Arduino(context);
         view.hideConnectButton();
         view.hideChat();
+
+        arduino = new Arduino(context);
+        interactor.setOnGraphListener(onGraphListener);
+        interactor.startTimer();
     }
 
     @Override
@@ -76,6 +80,7 @@ public class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void onDestroy() {
+        interactor.stopTimer();
         arduino.unsetArduinoListener();
         arduino.close();
     }
@@ -95,7 +100,18 @@ public class MainPresenterImpl implements MainPresenter {
     private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {
         @Override
         public void onGraphChanged(List<Node> nodes) {
-//            view.showUsers(nodes.stream().map(node -> Integer.valueOf(node.getId())));
+            List<Integer> ids = new ArrayList<>();
+            for (Node n : nodes) {
+                ids.add(n.getId());
+            }
+            view.showUsers(ids);
+        }
+
+        @Override
+        public void onTick() {
+            String message = interactor.getMapMessage();
+            byte[] data = Utils.formatArduinoMessage(message);
+            arduino.send(data);
         }
     };
 }

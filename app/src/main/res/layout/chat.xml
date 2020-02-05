@@ -33,6 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:src="@drawable/send"
+            android:tint="@color/chat_send"
             android:background="null"
             android:layout_margin="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
