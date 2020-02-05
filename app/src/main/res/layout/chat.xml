@@ -26,6 +26,18 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/chat_destination"/>
+
+        <EditText
+            android:id="@+id/chat_destination"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:hint="@string/chat_destination_hint"
+            android:text="@string/chat_destination_value"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toLeftOf="@id/chat_send"/>
 
         <ImageButton
@@ -34,7 +46,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/send"
             android:tint="@color/chat_send"
-            android:background="null"
+            android:background="@null"
             android:layout_margin="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"

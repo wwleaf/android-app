@@ -9,6 +9,11 @@ public class Node {
         this.name = name;
     }
 
+    public Node(int id) {
+        this.id = id;
+        this.name = "unnamed";
+    }
+
     public int getId() {
         return id;
     }

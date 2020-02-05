@@ -50,22 +50,42 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     @Override
-    public void processMessage(String message) {
-        if (message.length() == 0) return;
+    public boolean processMessage(String message) {
+        if (message.length() == 0) {
+            return false;
+        }
+
         if (message.charAt(0) == 127) {
             List<Pair<Node, Node>> edges = new ArrayList<>();
             String[] pairs = message.substring(1).split(",");
             for (String pair : pairs) {
                 String[] nodes = pair.split(":");
-                Node n1 = new Node(Integer.parseInt(nodes[0]), "unnamed");
-                Node n2 = new Node(Integer.parseInt(nodes[1]), "unnamed");
+                Node n1 = new Node(Integer.parseInt(nodes[0]));
+                Node n2 = new Node(Integer.parseInt(nodes[1]));
                 edges.add(Pair.create(n1, n2));
             }
             boolean hasChanged = graphService.load(edges);
             if (listener != null && hasChanged) {
                 listener.onGraphChanged(graphService.getNodes());
             }
+            return false;
         }
+
+        return true;
+    }
+
+    @Override
+    public String getMessage(String message, int destId) {
+        if (destId == 0) {
+            return getBroadcastMessage(message);
+        }
+        // prefix shortest path...
+        return message;
+    }
+
+    @Override
+    public String getBroadcastMessage(String message) {
+        return message;
     }
 
     @Override

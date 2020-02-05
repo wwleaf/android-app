@@ -62,8 +62,9 @@ public class MainPresenterImpl implements MainPresenter {
             @Override
             public void onArduinoMessage(byte[] bytes) {
                 String message = new String(bytes);
-                interactor.processMessage(message);
-                view.appendChatMessage("<- " + message);
+                if (interactor.processMessage(message)) {
+                    view.appendChatMessage("<- " + message);
+                }
             }
 
             @Override
@@ -92,7 +93,8 @@ public class MainPresenterImpl implements MainPresenter {
     }
 
     @Override
-    public void onMessage(String message) {
+    public void onMessage(String message, int destId) {
+        message = interactor.getMessage(message, destId);
         byte[] data = Utils.formatArduinoMessage(message);
         arduino.send(data);
         view.appendChatMessage("-> " + message);
@@ -111,6 +113,7 @@ public class MainPresenterImpl implements MainPresenter {
         @Override
         public void onTick() {
             String message = interactor.getMapMessage();
+            message = interactor.getBroadcastMessage(message);
             byte[] data = Utils.formatArduinoMessage(message);
             arduino.send(data);
         }

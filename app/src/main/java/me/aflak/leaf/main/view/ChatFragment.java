@@ -23,7 +23,8 @@ public class ChatFragment extends Fragment {
     private OnChatListener listener;
 
     @BindView(R.id.chat_text) TextView chat;
-    @BindView(R.id.chat_input) EditText editText;
+    @BindView(R.id.chat_input) EditText input;
+    @BindView(R.id.chat_destination) EditText destination;
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -36,8 +37,9 @@ public class ChatFragment extends Fragment {
     @OnClick(R.id.chat_send)
     public void onSendMessage() {
         if (listener != null) {
-            String message = editText.getText().toString();
-            listener.onMessage(message);
+            String message = input.getText().toString();
+            int destId = Integer.parseInt(destination.getText().toString());
+            listener.onMessage(message, destId);
         }
     }
 
@@ -51,6 +53,6 @@ public class ChatFragment extends Fragment {
     }
 
     interface OnChatListener {
-        void onMessage(String message);
+        void onMessage(String message, int destId);
     }
 }

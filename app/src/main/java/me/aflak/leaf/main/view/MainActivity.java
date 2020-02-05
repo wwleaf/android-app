@@ -118,5 +118,5 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     }
 
-    private ChatFragment.OnChatListener chatListener = (message) -> presenter.onMessage(message);
+    private ChatFragment.OnChatListener chatListener = (message, destId) -> presenter.onMessage(message, destId);
 }
