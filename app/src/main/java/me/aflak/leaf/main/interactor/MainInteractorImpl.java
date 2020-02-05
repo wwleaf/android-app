@@ -5,6 +5,7 @@ import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -60,8 +61,8 @@ public class MainInteractorImpl implements MainInteractor {
                 Node n2 = new Node(Integer.parseInt(nodes[1]), "unnamed");
                 edges.add(Pair.create(n1, n2));
             }
-            graphService.load(edges);
-            if (listener != null) {
+            boolean hasChanged = graphService.load(edges);
+            if (listener != null && hasChanged) {
                 listener.onGraphChanged(graphService.getNodes());
             }
         }
@@ -69,8 +70,9 @@ public class MainInteractorImpl implements MainInteractor {
 
     @Override
     public String getMapMessage() {
-//        List<Pair<Node, Node>> edges = graphService.getEdges();
-        return "hello";
+        List<Pair<Node, Node>> edges = graphService.getEdges();
+        List<String> edgesString = edges.stream().map(pair -> pair.first.getId() + ":" + pair.second.getId()).collect(Collectors.toList());
+        return String.join(",", edgesString);
     }
 
     @Override

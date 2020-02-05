@@ -66,12 +66,15 @@ public class GraphService {
         }
     }
 
-    public void load(List<Pair<Node, Node>> edges) {
+    public boolean load(List<Pair<Node, Node>> edges) {
+        boolean changed = false;
         for (Pair<Node, Node> pair : edges) {
             if (!graph.containsEdge(pair.first, pair.second)) {
                 graph.addEdge(pair.first, pair.second);
+                changed = true;
             }
         }
+        return changed;
     }
 
     public List<Pair<Node, Node>> getEdges() {
