@@ -2,9 +2,7 @@ package me.aflak.leaf.main.presenter;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
-import android.util.Pair;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 

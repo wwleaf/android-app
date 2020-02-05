@@ -17,6 +17,9 @@ import me.aflak.leaf.graph.Node;
 
 public class MainInteractorImpl implements MainInteractor {
     private final static int INTERVAL_SEC = 60 * 5;
+    private final static char ID = 0;
+    private final static char GRAPH_BROADCAST_CODE = 127;
+    private final static char TARGET_BROADCAST_CODE = 126;
     private OnGraphListener listener;
     private Handler handler;
     private Runnable handlerTask;
@@ -55,11 +58,13 @@ public class MainInteractorImpl implements MainInteractor {
             return false;
         }
 
-        if (message.charAt(0) == 127) {
+        if (message.charAt(0) == GRAPH_BROADCAST_CODE) {
             List<Pair<Node, Node>> edges = new ArrayList<>();
             String[] pairs = message.substring(1).split(",");
-            for (String pair : pairs) {
-                String[] nodes = pair.split(":");
+            int fromId = Integer.parseInt(pairs[0]);
+            edges.add(Pair.create(new Node(ID), new Node(fromId)));
+            for (int i=1 ; i<pairs.length ; i++) {
+                String[] nodes = pairs[i].split(":");
                 Node n1 = new Node(Integer.parseInt(nodes[0]));
                 Node n2 = new Node(Integer.parseInt(nodes[1]));
                 edges.add(Pair.create(n1, n2));
@@ -80,6 +85,7 @@ public class MainInteractorImpl implements MainInteractor {
             return getBroadcastMessage(message);
         }
         // prefix shortest path...
+        message = TARGET_BROADCAST_CODE + message;
         return message;
     }
 
@@ -91,8 +97,8 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public String getMapMessage() {
         List<Pair<Node, Node>> edges = graphService.getEdges();
-        List<String> edgesString = edges.stream().map(pair -> pair.first.getId() + ":" + pair.second.getId()).collect(Collectors.toList());
-        return String.join(",", edgesString);
+        List<String> edgesString = edges.stream().map(pair -> pair.first.getId() + "," + pair.second.getId()).collect(Collectors.toList());
+        return GRAPH_BROADCAST_CODE + ID + "," + String.join(":", edgesString);
     }
 
     @Override
