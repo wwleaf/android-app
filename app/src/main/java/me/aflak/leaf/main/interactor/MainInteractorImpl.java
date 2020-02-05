@@ -17,7 +17,8 @@ import me.aflak.leaf.graph.Node;
 
 public class MainInteractorImpl implements MainInteractor {
     private final static int INTERVAL_SEC = 60 * 5;
-    private final static char ID = 0;
+    private final static char ID = 1;
+    private final static char BROADCAST_ID = 0;
     private final static char GRAPH_BROADCAST_CODE = 127;
     private final static char TARGET_BROADCAST_CODE = 126;
     private OnGraphListener listener;
@@ -81,7 +82,7 @@ public class MainInteractorImpl implements MainInteractor {
 
     @Override
     public String getMessage(String message, int destId) {
-        if (destId == 0) {
+        if (destId == BROADCAST_ID) {
             return getBroadcastMessage(message);
         }
         // prefix shortest path...
