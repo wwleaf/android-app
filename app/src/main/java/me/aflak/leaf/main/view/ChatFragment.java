@@ -48,6 +48,10 @@ public class ChatFragment extends Fragment {
         Objects.requireNonNull(getActivity()).runOnUiThread(() -> chat.setText(text));
     }
 
+    public void clearInput() {
+        chat.setText("");
+    }
+
     public void setListener(OnChatListener listener) {
         this.listener = listener;
     }

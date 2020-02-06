@@ -92,10 +92,11 @@ public class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void onMessage(String message, int destId) {
+        view.clearInput();
+        view.appendChatMessage("-> " + message);
         message = interactor.getMessage(message, destId);
         byte[] data = Utils.formatArduinoMessage(message);
         arduino.send(data);
-        view.appendChatMessage("-> " + message);
     }
 
     private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {

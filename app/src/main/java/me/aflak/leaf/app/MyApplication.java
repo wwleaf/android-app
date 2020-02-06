@@ -1,10 +1,6 @@
-package me.aflak.leaf;
+package me.aflak.leaf.app;
 
 import android.app.Application;
-
-import me.aflak.leaf.app.AppComponent;
-import me.aflak.leaf.app.AppModule;
-import me.aflak.leaf.app.DaggerAppComponent;
 
 public class MyApplication extends Application {
     private AppModule appModule;
@@ -14,7 +10,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         app = this;
-        appModule = new AppModule(this);
+        appModule = new AppModule(getApplicationContext());
     }
 
     public static MyApplication getApp() {

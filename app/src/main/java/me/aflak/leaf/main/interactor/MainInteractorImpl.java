@@ -7,11 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
-import me.aflak.leaf.MyApplication;
-import me.aflak.leaf.graph.DaggerGraphComponent;
-import me.aflak.leaf.graph.GraphModule;
 import me.aflak.leaf.graph.GraphService;
 import me.aflak.leaf.graph.Node;
 
@@ -21,17 +16,13 @@ public class MainInteractorImpl implements MainInteractor {
     private final static char BROADCAST_ID = 0;
     private final static char GRAPH_BROADCAST_CODE = 127;
     private final static char TARGET_BROADCAST_CODE = 126;
+    private GraphService graphService;
     private OnGraphListener listener;
     private Handler handler;
     private Runnable handlerTask;
 
-    @Inject GraphService graphService;
-
-    public MainInteractorImpl() {
-        DaggerGraphComponent.builder()
-                .graphModule(new GraphModule())
-                .appModule(MyApplication.getApp().getAppModule())
-                .build().inject(this);
+    public MainInteractorImpl(GraphService graphService) {
+        this.graphService = graphService;
 
         graphService.load();
         handler = new Handler();
@@ -45,12 +36,12 @@ public class MainInteractorImpl implements MainInteractor {
 
     @Override
     public void startTimer() {
-        handlerTask.run();
+//        handlerTask.run();
     }
 
     @Override
     public void stopTimer() {
-        handler.removeCallbacks(handlerTask);
+//        handler.removeCallbacks(handlerTask);
     }
 
     @Override
@@ -98,6 +89,9 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public String getMapMessage() {
         List<Pair<Node, Node>> edges = graphService.getEdges();
+        if (edges.isEmpty()) {
+            return  null;
+        }
         List<String> edgesString = edges.stream().map(pair -> pair.first.getId() + "," + pair.second.getId()).collect(Collectors.toList());
         return GRAPH_BROADCAST_CODE + ID + ":" + String.join(":", edgesString);
     }

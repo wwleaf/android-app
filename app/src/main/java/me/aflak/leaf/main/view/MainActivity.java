@@ -19,6 +19,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.aflak.leaf.R;
+import me.aflak.leaf.app.MyApplication;
+import me.aflak.leaf.graph.GraphModule;
 import me.aflak.leaf.main.dagger.DaggerMainComponent;
 import me.aflak.leaf.main.dagger.MainModule;
 import me.aflak.leaf.main.presenter.MainPresenter;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         DaggerMainComponent.builder()
+                .graphModule(new GraphModule())
+                .appModule(MyApplication.getApp().getAppModule())
                 .mainModule(new MainModule(this))
                 .build().inject(this);
 
@@ -114,8 +118,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void showUsers(List<Integer> users) {
+    public void clearInput() {
+        chatFragment.clearInput();
+    }
 
+    @Override
+    public void showUsers(List<Integer> users) {
+        // show users
     }
 
     private ChatFragment.OnChatListener chatListener = (message, destId) -> presenter.onMessage(message, destId);
