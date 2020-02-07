@@ -104,10 +104,10 @@ public class MainInteractorImpl implements MainInteractor {
             return null;
         }
 
-        byte[] newMessage = new byte[message.length + 3 + path.size()];
+        byte[] newMessage = new byte[3 + path.size() + message.length];
         newMessage[0] = Message.TARGET_MESSAGE_CODE;
         newMessage[1] = userId;
-        newMessage[3] = (byte) path.size();
+        newMessage[2] = (byte) path.size();
         int pos = 3;
         for (Node node : path) {
             newMessage[pos++] = (byte) node.getId();
@@ -130,6 +130,13 @@ public class MainInteractorImpl implements MainInteractor {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean isTarget(Message message) {
+        byte[] data = message.getData();
+        byte nodeCount = data[0];
+        return userId == data[nodeCount];
     }
 
     @Override

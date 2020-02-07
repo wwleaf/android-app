@@ -70,6 +70,11 @@ public class MainPresenterImpl implements MainPresenter {
                             System.arraycopy(msg, 0, newMessage, 2, msg.length);
                             byte[] arduinoMessage = Utils.formatArduinoMessage(newMessage);
                             arduino.send(arduinoMessage);
+                        } else if (interactor.isTarget(message)) {
+                            int startIndex = msg[0] + 1;
+                            byte[] newMessage = new byte[msg.length - startIndex];
+                            System.arraycopy(msg, startIndex, newMessage, 0, newMessage.length);
+                            view.appendChatMessage("[" + message.getSourceId() + "] -> [" + interactor.getId() + "] [" + new String(newMessage) + "]");
                         }
                     } else if (message.getCode() == Message.BROADCAST_MESSAGE_CODE) {
                         view.appendChatMessage("[" + message.getSourceId() + "] " + new String(message.getData()));
@@ -114,7 +119,7 @@ public class MainPresenterImpl implements MainPresenter {
         byte[] data = interactor.formatMessage(message.getBytes(), destId);
         if (data != null) {
             view.clearInput();
-            view.appendChatMessage("[" + interactor.getId() + "] " + message);
+            view.appendChatMessage("[" + interactor.getId() + "] -> [" + destId + "] [" + message + "]");
             data = Utils.formatArduinoMessage(data);
             arduino.send(data);
         } else {
