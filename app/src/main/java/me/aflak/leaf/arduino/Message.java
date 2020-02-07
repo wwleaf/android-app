@@ -6,29 +6,29 @@ public class Message {
     public final static byte BROADCAST_MESSAGE_CODE = 126;
     public final static byte TARGET_MESSAGE_CODE = 125;
 
-    private int code;
-    private int sourceId;
+    private byte code;
+    private byte sourceId;
     private byte[] data;
 
-    public Message(int code, int sourceId, byte[] data) {
+    public Message(byte code, byte sourceId, byte[] data) {
         this.code = code;
         this.sourceId = sourceId;
         this.data = data;
     }
 
-    public int getCode() {
+    public byte getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(byte code) {
         this.code = code;
     }
 
-    public int getSourceId() {
+    public byte getSourceId() {
         return sourceId;
     }
 
-    public void setSourceId(int sourceId) {
+    public void setSourceId(byte sourceId) {
         this.sourceId = sourceId;
     }
 

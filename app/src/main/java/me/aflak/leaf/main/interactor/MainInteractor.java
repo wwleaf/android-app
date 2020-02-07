@@ -7,6 +7,7 @@ public interface MainInteractor {
     void stopTimer();
     Message parseMessage(byte[] message);
     byte[] formatMessage(byte[] message, int destId);
+    boolean shouldBroadcast(Message message);
     void processReceivedGraph(Message message);
     void setOnGraphListener(MainInteractorImpl.OnGraphListener listener);
     byte[] getGraphBroadcastMessage();

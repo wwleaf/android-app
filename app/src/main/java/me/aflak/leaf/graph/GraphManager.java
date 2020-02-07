@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Set;
 
 public class GraphManager {
@@ -29,7 +28,7 @@ public class GraphManager {
     public Graph load() {
         String json = sharedPreferences.getString(PREF_KEY, null);
         if (json != null) {
-            Type listType = new TypeToken<ArrayList<Edge>>(){}.getType();
+            Type listType = new TypeToken<Set<Edge>>(){}.getType();
             Set<Edge> edges = gson.fromJson(json, listType);
             Graph graph = new Graph();
             graph.addEdges(edges);

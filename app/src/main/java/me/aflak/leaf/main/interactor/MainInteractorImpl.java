@@ -107,13 +107,29 @@ public class MainInteractorImpl implements MainInteractor {
         byte[] newMessage = new byte[message.length + 3 + path.size()];
         newMessage[0] = Message.TARGET_MESSAGE_CODE;
         newMessage[1] = userId;
-        newMessage[2] = (byte) path.size();
+        newMessage[3] = (byte) path.size();
         int pos = 3;
         for (Node node : path) {
             newMessage[pos++] = (byte) node.getId();
         }
         System.arraycopy(message, 0, newMessage, pos, message.length);
         return newMessage;
+    }
+
+    @Override
+    public boolean shouldBroadcast(Message message) {
+        byte[] data = message.getData();
+        byte nodeCount = data[0];
+        int sourcePos = -1;
+        for (int i=1 ; i<1 + nodeCount ; i++) {
+            if (data[i] == message.getSourceId()) {
+                sourcePos = i;
+            }
+            if (userId == data[i]) {
+                return sourcePos != -1 && i < nodeCount;
+            }
+        }
+        return false;
     }
 
     @Override

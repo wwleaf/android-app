@@ -61,11 +61,16 @@ public class MainPresenterImpl implements MainPresenter {
                 Message message = interactor.parseMessage(data);
                 if (message != null) {
                     if (message.getCode() == Message.TARGET_MESSAGE_CODE) {
-                        byte[] raw = message.getData();
-                        int startIndex = 1 + raw[2];
-                        byte[] msg = new byte[raw.length - startIndex];
-                        System.arraycopy(raw, startIndex, msg, 0, msg.length);
-                        view.appendChatMessage("[" + message.getSourceId() + "] -> [" + interactor.getId() + "] " + new String(msg));
+                        byte[] msg = message.getData();
+                        boolean shouldBroadcast = interactor.shouldBroadcast(message);
+                        if (shouldBroadcast) {
+                            byte[] newMessage = new byte[msg.length + 2];
+                            newMessage[0] = message.getCode();
+                            newMessage[1] = interactor.getId();
+                            System.arraycopy(msg, 0, newMessage, 2, msg.length);
+                            byte[] arduinoMessage = Utils.formatArduinoMessage(newMessage);
+                            arduino.send(arduinoMessage);
+                        }
                     } else if (message.getCode() == Message.BROADCAST_MESSAGE_CODE) {
                         view.appendChatMessage("[" + message.getSourceId() + "] " + new String(message.getData()));
                     } else if (message.getCode() == Message.BROADCAST_GRAPH_CODE) {
