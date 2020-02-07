@@ -18,6 +18,7 @@ public class MainInteractorImpl implements MainInteractor {
     private Handler handler;
     private Runnable handlerTask;
     private byte userId = 1;
+    private Node selfNode;
 
     public MainInteractorImpl(GraphService graphService) {
         this.graphService = graphService;
@@ -35,6 +36,8 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public void setId(byte id) {
         userId = id;
+        selfNode = new Node(userId);
+        graphService.addNode(selfNode);
     }
 
     @Override
@@ -59,7 +62,9 @@ public class MainInteractorImpl implements MainInteractor {
         }
         byte[] data = new byte[message.length - 2];
         System.arraycopy(message, 2, data, 0, message.length - 2);
-        return new Message(message[0], message[1], data);
+        Message msg = new Message(message[0], message[1], data);
+        graphService.connect(selfNode, new Node(msg.getSourceId()));
+        return msg;
     }
 
     @Override
@@ -67,7 +72,7 @@ public class MainInteractorImpl implements MainInteractor {
         List<Pair<Node, Node>> edges = new ArrayList<>();
         byte[] data = message.getData();
         if (data.length % 2 == 0) {
-            edges.add(Pair.create(new Node(userId), new Node(message.getSourceId())));
+            edges.add(Pair.create(selfNode, new Node(message.getSourceId())));
             for (int i = 0; i < data.length; i += 2) {
                 Node n1 = new Node(data[i]);
                 Node n2 = new Node(data[i + 1]);
@@ -91,8 +96,8 @@ public class MainInteractorImpl implements MainInteractor {
         }
 
         // shortest path to target
-        List<Node> path = graphService.shortestPath(new Node(userId), new Node(destId));
-        if (path.isEmpty()) {
+        List<Node> path = graphService.shortestPath(selfNode, new Node(destId));
+        if (path == null || path.isEmpty()) {
             return null;
         }
 
@@ -114,7 +119,7 @@ public class MainInteractorImpl implements MainInteractor {
             return  null;
         }
 
-        int byteCount = edges.size() + 1;
+        int byteCount = 2 * edges.size() + 2;
         byte[] message = new byte[byteCount];
         message[0] = Message.BROADCAST_GRAPH_CODE;
         message[1] = userId;

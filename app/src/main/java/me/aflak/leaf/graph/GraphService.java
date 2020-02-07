@@ -29,13 +29,16 @@ public class GraphService {
     }
 
     public List<Node> shortestPath(Node from, Node to) {
-        GraphPath<Node, DefaultEdge> path = DijkstraShortestPath.findPathBetween(graph, from, to);
-        List<Node> nodes = new ArrayList<>();
-        for (DefaultEdge edge : path.getEdgeList()) {
-            nodes.add(graph.getEdgeSource(edge));
+        if (graph.containsVertex(from) && graph.containsVertex(to)) {
+            GraphPath<Node, DefaultEdge> path = DijkstraShortestPath.findPathBetween(graph, from, to);
+            List<Node> nodes = new ArrayList<>();
+            for (DefaultEdge edge : path.getEdgeList()) {
+                nodes.add(graph.getEdgeSource(edge));
+            }
+            nodes.add(to);
+            return nodes;
         }
-        nodes.add(to);
-        return nodes;
+        return null;
     }
 
     public void save() {
@@ -77,5 +80,17 @@ public class GraphService {
 
     public List<Node> getNodes() {
         return new ArrayList<>(graph.vertexSet());
+    }
+
+    public void addNode(Node node) {
+        if (!graph.containsVertex(node)) {
+            graph.addVertex(node);
+        }
+    }
+
+    public void connect(Node from, Node to) {
+        addNode(from);
+        addNode(to);
+        graph.addEdge(from, to);
     }
 }
