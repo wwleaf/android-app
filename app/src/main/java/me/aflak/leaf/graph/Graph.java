@@ -1,10 +1,6 @@
 package me.aflak.leaf.graph;
 
-import android.util.Pair;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +31,8 @@ public class Graph {
     }
 
     public void addEdge(Edge edge) {
+        this.nodes.add(edge.getFrom());
+        this.nodes.add(edge.getTo());
         this.edges.add(edge);
     }
 
@@ -42,6 +40,8 @@ public class Graph {
         boolean changed = false;
         for (Edge edge : edges) {
             if (!this.edges.contains(edge)) {
+                this.nodes.add(edge.getFrom());
+                this.nodes.add(edge.getTo());
                 edges.add(edge);
                 changed = true;
             }
@@ -58,19 +58,13 @@ public class Graph {
     }
 
     public void connect(Node from, Node to) {
-        if (!hasNode(from)) {
-            nodes.add(from);
-        }
-
-        if (!hasNode(to)) {
-            nodes.add(to);
-        }
-
+        nodes.add(from);
+        nodes.add(to);
         edges.add(new Edge(from, to));
     }
 
     public List<Node> shortestPath(Node from, Node to) {
-        if (!hasNode(from) || !hasNode(to)) {
+        if (!nodes.contains(from) || !nodes.contains(to)) {
             return null;
         }
 

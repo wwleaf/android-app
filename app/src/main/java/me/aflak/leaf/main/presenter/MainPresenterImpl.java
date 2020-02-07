@@ -2,10 +2,8 @@ package me.aflak.leaf.main.presenter;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -77,7 +75,7 @@ public class MainPresenterImpl implements MainPresenter {
                             view.appendChatMessage("[" + message.getSourceId() + "] -> [" + interactor.getId() + "] [" + new String(newMessage) + "]");
                         }
                     } else if (message.getCode() == Message.BROADCAST_MESSAGE_CODE) {
-                        view.appendChatMessage("[" + message.getSourceId() + "] " + new String(message.getData()));
+                        view.appendChatMessage("[" + message.getSourceId() + "] -> [0] [" + new String(message.getData()) + "]");
                     } else if (message.getCode() == Message.BROADCAST_GRAPH_CODE) {
                         interactor.processReceivedGraph(message);
                     }
