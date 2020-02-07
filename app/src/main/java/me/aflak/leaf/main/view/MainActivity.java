@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @BindView(R.id.connection_parent) ConstraintLayout connectionLayout;
     @BindView(R.id.connection_usb_icon) ImageView icon;
     @BindView(R.id.connection_connect_button) Button connect;
+    @BindView(R.id.connection_id) EditText userId;
 
     @Inject ChatFragment chatFragment;
     @Inject MainPresenter presenter;
@@ -66,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @OnClick(R.id.connection_connect_button)
     void onConnect() {
-        presenter.onConnectClicked();
+        int id = Integer.parseInt(userId.getText().toString());
+        presenter.onConnectClicked(id);
     }
 
     @Override

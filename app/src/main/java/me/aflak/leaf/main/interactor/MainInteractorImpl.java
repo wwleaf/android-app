@@ -5,21 +5,19 @@ import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import me.aflak.leaf.arduino.Message;
 import me.aflak.leaf.graph.GraphService;
 import me.aflak.leaf.graph.Node;
 
 public class MainInteractorImpl implements MainInteractor {
     private final static int INTERVAL_SEC = 60 * 5;
-    private final static char ID = 1;
-    private final static char BROADCAST_ID = 0;
-    private final static char GRAPH_BROADCAST_CODE = 127;
-    private final static char TARGET_BROADCAST_CODE = 126;
+
     private GraphService graphService;
     private OnGraphListener listener;
     private Handler handler;
     private Runnable handlerTask;
+    private byte userId = 1;
 
     public MainInteractorImpl(GraphService graphService) {
         this.graphService = graphService;
@@ -35,65 +33,97 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     @Override
+    public void setId(byte id) {
+        userId = id;
+    }
+
+    @Override
+    public byte getId() {
+        return userId;
+    }
+
+    @Override
     public void startTimer() {
-//        handlerTask.run();
+        handlerTask.run();
     }
 
     @Override
     public void stopTimer() {
-//        handler.removeCallbacks(handlerTask);
+        handler.removeCallbacks(handlerTask);
     }
 
     @Override
-    public boolean processMessage(String message) {
-        if (message.length() == 0) {
-            return false;
+    public Message parseMessage(byte[] message) {
+        if (message.length < 3) {
+            return null;
         }
+        byte[] data = new byte[message.length - 2];
+        System.arraycopy(message, 2, data, 0, message.length - 2);
+        return new Message(message[0], message[1], data);
+    }
 
-        if (message.charAt(0) == GRAPH_BROADCAST_CODE) {
-            List<Pair<Node, Node>> edges = new ArrayList<>();
-            String[] pairs = message.substring(1).split(":");
-            int fromId = Integer.parseInt(pairs[0]);
-            edges.add(Pair.create(new Node(ID), new Node(fromId)));
-            for (int i=1 ; i<pairs.length ; i++) {
-                String[] nodes = pairs[i].split(",");
-                Node n1 = new Node(Integer.parseInt(nodes[0]));
-                Node n2 = new Node(Integer.parseInt(nodes[1]));
+    @Override
+    public void processReceivedGraph(Message message) {
+        List<Pair<Node, Node>> edges = new ArrayList<>();
+        byte[] data = message.getData();
+        if (data.length % 2 == 0) {
+            edges.add(Pair.create(new Node(userId), new Node(message.getSourceId())));
+            for (int i = 0; i < data.length; i += 2) {
+                Node n1 = new Node(data[i]);
+                Node n2 = new Node(data[i + 1]);
                 edges.add(Pair.create(n1, n2));
             }
             boolean hasChanged = graphService.load(edges);
             if (listener != null && hasChanged) {
                 listener.onGraphChanged(graphService.getNodes());
             }
-            return false;
+        }
+    }
+
+    @Override
+    public byte[] formatMessage(byte[] message, int destId) {
+        if (destId == Message.BROADCAST_ID) {
+            byte[] newMessage = new byte[message.length + 2];
+            newMessage[0] = Message.BROADCAST_MESSAGE_CODE;
+            newMessage[1] = userId;
+            System.arraycopy(message, 0, newMessage, 2, message.length);
+            return newMessage;
         }
 
-        return true;
-    }
-
-    @Override
-    public String getMessage(String message, int destId) {
-        if (destId == BROADCAST_ID) {
-            return getBroadcastMessage(message);
+        // shortest path to target
+        List<Node> path = graphService.shortestPath(new Node(userId), new Node(destId));
+        if (path.isEmpty()) {
+            return null;
         }
-        // prefix shortest path...
-        message = TARGET_BROADCAST_CODE + message;
-        return message;
+
+        byte[] newMessage = new byte[message.length + 2 + path.size()];
+        newMessage[0] = Message.TARGET_MESSAGE_CODE;
+        newMessage[1] = userId;
+        int pos = 2;
+        for (Node node : path) {
+            newMessage[pos++] = (byte) node.getId();
+        }
+        System.arraycopy(message, 0, newMessage, pos, message.length);
+        return newMessage;
     }
 
     @Override
-    public String getBroadcastMessage(String message) {
-        return message;
-    }
-
-    @Override
-    public String getMapMessage() {
+    public byte[] getGraphBroadcastMessage() {
         List<Pair<Node, Node>> edges = graphService.getEdges();
         if (edges.isEmpty()) {
             return  null;
         }
-        List<String> edgesString = edges.stream().map(pair -> pair.first.getId() + "," + pair.second.getId()).collect(Collectors.toList());
-        return GRAPH_BROADCAST_CODE + ID + ":" + String.join(":", edgesString);
+
+        int byteCount = edges.size() + 1;
+        byte[] message = new byte[byteCount];
+        message[0] = Message.BROADCAST_GRAPH_CODE;
+        message[1] = userId;
+        int pos = 2;
+        for (Pair<Node, Node> pair : edges) {
+            message[pos++] = (byte) pair.first.getId();
+            message[pos++] = (byte) pair.second.getId();
+        }
+        return message;
     }
 
     @Override

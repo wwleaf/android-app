@@ -10,6 +10,7 @@ import javax.inject.Inject;
 
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
+import me.aflak.leaf.arduino.Message;
 import me.aflak.leaf.arduino.Utils;
 import me.aflak.leaf.graph.GraphService;
 import me.aflak.leaf.graph.Node;
@@ -58,10 +59,14 @@ public class MainPresenterImpl implements MainPresenter {
             }
 
             @Override
-            public void onArduinoMessage(byte[] bytes) {
-                String message = new String(bytes);
-                if (interactor.processMessage(message)) {
-                    view.appendChatMessage("<- " + message);
+            public void onArduinoMessage(byte[] data) {
+                Message message = interactor.parseMessage(data);
+                if (message != null) {
+                    if (message.getCode() == Message.TARGET_MESSAGE_CODE || message.getCode() == Message.BROADCAST_MESSAGE_CODE) {
+                        view.appendChatMessage("[" + message.getSourceId() + "] " + new String(message.getData()));
+                    } else if (message.getCode() == Message.BROADCAST_GRAPH_CODE) {
+                        interactor.processReceivedGraph(message);
+                    }
                 }
             }
 
@@ -86,17 +91,26 @@ public class MainPresenterImpl implements MainPresenter {
     }
 
     @Override
-    public void onConnectClicked() {
-        arduino.open(device);
+    public void onConnectClicked(int id) {
+        if (id > 0 && id <= 127) {
+            interactor.setId((byte) id);
+            arduino.open(device);
+        } else {
+            view.showMessage("Invalid id");
+        }
     }
 
     @Override
     public void onMessage(String message, int destId) {
-        view.clearInput();
-        view.appendChatMessage("-> " + message);
-        message = interactor.getMessage(message, destId);
-        byte[] data = Utils.formatArduinoMessage(message);
-        arduino.send(data);
+        byte[] data = interactor.formatMessage(message.getBytes(), destId);
+        if (data != null) {
+            view.clearInput();
+            view.appendChatMessage("[" + interactor.getId() + "] " + message);
+            data = Utils.formatArduinoMessage(data);
+            arduino.send(data);
+        } else {
+            view.showMessage("Invalid destination id");
+        }
     }
 
     private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {
@@ -111,10 +125,11 @@ public class MainPresenterImpl implements MainPresenter {
 
         @Override
         public void onTick() {
-            String message = interactor.getMapMessage();
-            message = interactor.getBroadcastMessage(message);
-            byte[] data = Utils.formatArduinoMessage(message);
-            arduino.send(data);
+            byte[] message = interactor.getGraphBroadcastMessage();
+            if (message != null) {
+                byte[] data = Utils.formatArduinoMessage(message);
+                arduino.send(data);
+            }
         }
     };
 }

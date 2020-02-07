@@ -6,4 +6,5 @@
     <string name="chat_destination_hint">id</string>
     <string name="chat_destination_value">0</string>
     <string name="chat_input">Type a message</string>
+    <string name="connection_id">Your id</string>
 </resources>

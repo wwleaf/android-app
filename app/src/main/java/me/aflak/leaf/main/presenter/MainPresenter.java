@@ -6,6 +6,6 @@ public interface MainPresenter {
     void onCreate(Context context);
     void onStart();
     void onDestroy();
-    void onConnectClicked();
+    void onConnectClicked(int id);
     void onMessage(String message, int destId);
 }
