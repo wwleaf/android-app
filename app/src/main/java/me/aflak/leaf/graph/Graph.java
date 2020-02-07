@@ -1,8 +1,11 @@
 package me.aflak.leaf.graph;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 public class Graph {
@@ -68,7 +71,75 @@ public class Graph {
             return null;
         }
 
-        // TODO dijkstra
-        return Arrays.asList(from, to);
+        Set<_Edge> _edges = new HashSet<>();
+        for (Edge e : this.edges) {
+            _edges.add(new _Edge(e));
+        }
+
+        Queue<_Node> queue = new LinkedList<>();
+        queue.add(new _Node(from));
+        _Node _to = null;
+
+        while (!queue.isEmpty()) {
+            _Node n = queue.remove();
+            if (n.node.equals(to)) {
+                _to = n;
+                break;
+            }
+
+            for (_Edge e : _edges) {
+                if (e._from.node.equals(n.node)) {
+                    if (!e._to.discovered) {
+                        e._to.discovered = true;
+                        e._to.parent = n;
+                        queue.add(e._to);
+                    }
+                }
+
+                if (e._to.node.equals(n.node)) {
+                    if (!e._from.discovered) {
+                        e._from.discovered = true;
+                        e._from.parent = n;
+                        queue.add(e._from);
+                    }
+                }
+            }
+        }
+
+        if (_to == null) {
+            return null;
+        }
+
+        List<Node> path = new ArrayList<>();
+        while (_to.parent != null) {
+            path.add(_to.node);
+            _to = _to.parent;
+        }
+        path.add(from);
+        Collections.reverse(path);
+
+        return path;
+    }
+
+    private static class _Edge {
+        _Node _from;
+        _Node _to;
+
+        _Edge(Edge edge) {
+            _from = new _Node(edge.getFrom());
+            _to = new _Node(edge.getTo());
+        }
+    }
+
+    private static class _Node {
+        Node node;
+        _Node parent;
+        boolean discovered;
+
+        _Node(Node node) {
+            this.node = node;
+            parent = null;
+            discovered = false;
+        }
     }
 }
