@@ -52,14 +52,6 @@ public class Graph {
         return changed;
     }
 
-    public boolean hasEdge(Node from, Node to) {
-        return edges.contains(new Edge(from, to));
-    }
-
-    public boolean hasNode(Node node) {
-        return nodes.contains(node);
-    }
-
     public void connect(Node from, Node to) {
         nodes.add(from);
         nodes.add(to);
