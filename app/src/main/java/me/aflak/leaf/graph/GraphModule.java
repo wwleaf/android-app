@@ -12,7 +12,7 @@ import dagger.Provides;
 @Module
 public class GraphModule {
     @Provides @Singleton
-    public GraphService provideGraphService(SharedPreferences sharedPreferences, Gson gson) {
-        return new GraphService(sharedPreferences, gson);
+    public GraphManager provideGraphService(SharedPreferences sharedPreferences, Gson gson) {
+        return new GraphManager(sharedPreferences, gson);
     }
 }

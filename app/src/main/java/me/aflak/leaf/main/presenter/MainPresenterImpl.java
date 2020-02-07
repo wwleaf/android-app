@@ -2,17 +2,17 @@ package me.aflak.leaf.main.presenter;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import javax.inject.Inject;
+import java.util.Set;
 
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
 import me.aflak.leaf.arduino.Message;
 import me.aflak.leaf.arduino.Utils;
-import me.aflak.leaf.graph.GraphService;
 import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.interactor.MainInteractor;
 import me.aflak.leaf.main.interactor.MainInteractorImpl;
@@ -23,8 +23,6 @@ public class MainPresenterImpl implements MainPresenter {
     private MainInteractor interactor;
     private Arduino arduino;
     private UsbDevice device;
-
-    @Inject GraphService service;
 
     public MainPresenterImpl(MainView view, MainInteractor interactor) {
         this.view = view;
@@ -62,7 +60,13 @@ public class MainPresenterImpl implements MainPresenter {
             public void onArduinoMessage(byte[] data) {
                 Message message = interactor.parseMessage(data);
                 if (message != null) {
-                    if (message.getCode() == Message.TARGET_MESSAGE_CODE || message.getCode() == Message.BROADCAST_MESSAGE_CODE) {
+                    if (message.getCode() == Message.TARGET_MESSAGE_CODE) {
+                        byte[] raw = message.getData();
+                        int startIndex = 1 + raw[2];
+                        byte[] msg = new byte[raw.length - startIndex];
+                        System.arraycopy(raw, startIndex, msg, 0, msg.length);
+                        view.appendChatMessage("[" + message.getSourceId() + "] -> [" + interactor.getId() + "] " + new String(msg));
+                    } else if (message.getCode() == Message.BROADCAST_MESSAGE_CODE) {
                         view.appendChatMessage("[" + message.getSourceId() + "] " + new String(message.getData()));
                     } else if (message.getCode() == Message.BROADCAST_GRAPH_CODE) {
                         interactor.processReceivedGraph(message);
@@ -115,7 +119,7 @@ public class MainPresenterImpl implements MainPresenter {
 
     private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {
         @Override
-        public void onGraphChanged(List<Node> nodes) {
+        public void onGraphChanged(Set<Node> nodes) {
             List<Integer> ids = new ArrayList<>();
             for (Node n : nodes) {
                 ids.add(n.getId());

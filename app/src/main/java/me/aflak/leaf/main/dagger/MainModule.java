@@ -4,7 +4,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import me.aflak.leaf.graph.GraphService;
+import me.aflak.leaf.graph.GraphManager;
 import me.aflak.leaf.main.interactor.MainInteractor;
 import me.aflak.leaf.main.interactor.MainInteractorImpl;
 import me.aflak.leaf.main.presenter.MainPresenter;
@@ -26,8 +26,8 @@ public class MainModule {
     }
 
     @Provides @Singleton
-    public MainInteractor provideMainInteractor(GraphService graphService) {
-        return new MainInteractorImpl(graphService);
+    public MainInteractor provideMainInteractor(GraphManager graphManager) {
+        return new MainInteractorImpl(graphManager);
     }
 
     @Provides @Singleton

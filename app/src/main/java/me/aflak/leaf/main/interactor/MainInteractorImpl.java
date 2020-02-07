@@ -1,35 +1,38 @@
 package me.aflak.leaf.main.interactor;
 
 import android.os.Handler;
-import android.util.Pair;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import me.aflak.leaf.arduino.Message;
-import me.aflak.leaf.graph.GraphService;
+import me.aflak.leaf.graph.Edge;
+import me.aflak.leaf.graph.Graph;
+import me.aflak.leaf.graph.GraphManager;
 import me.aflak.leaf.graph.Node;
 
 public class MainInteractorImpl implements MainInteractor {
-    private final static int INTERVAL_SEC = 60 * 5;
+    private final static int INTERVAL_MS = 1000 * 60 * 5;
 
-    private GraphService graphService;
+    private GraphManager graphManager;
     private OnGraphListener listener;
+    private Graph graph;
     private Handler handler;
     private Runnable handlerTask;
     private byte userId = 1;
     private Node selfNode;
 
-    public MainInteractorImpl(GraphService graphService) {
-        this.graphService = graphService;
+    public MainInteractorImpl(GraphManager graphManager) {
+        this.graphManager = graphManager;
+        this.graph = graphManager.load();
 
-        graphService.load();
         handler = new Handler();
         handlerTask = () -> {
             if (listener != null) {
                 listener.onTick();
             }
-            handler.postDelayed(handlerTask, INTERVAL_SEC);
+            handler.postDelayed(handlerTask, INTERVAL_MS);
         };
     }
 
@@ -37,7 +40,7 @@ public class MainInteractorImpl implements MainInteractor {
     public void setId(byte id) {
         userId = id;
         selfNode = new Node(userId);
-        graphService.addNode(selfNode);
+        graph.addNode(selfNode);
     }
 
     @Override
@@ -63,24 +66,24 @@ public class MainInteractorImpl implements MainInteractor {
         byte[] data = new byte[message.length - 2];
         System.arraycopy(message, 2, data, 0, message.length - 2);
         Message msg = new Message(message[0], message[1], data);
-        graphService.connect(selfNode, new Node(msg.getSourceId()));
+        graph.connect(selfNode, new Node(msg.getSourceId()));
         return msg;
     }
 
     @Override
     public void processReceivedGraph(Message message) {
-        List<Pair<Node, Node>> edges = new ArrayList<>();
+        Set<Edge> edges = new HashSet<>();
         byte[] data = message.getData();
         if (data.length % 2 == 0) {
-            edges.add(Pair.create(selfNode, new Node(message.getSourceId())));
+            edges.add(new Edge(selfNode, new Node(message.getSourceId())));
             for (int i = 0; i < data.length; i += 2) {
                 Node n1 = new Node(data[i]);
                 Node n2 = new Node(data[i + 1]);
-                edges.add(Pair.create(n1, n2));
+                edges.add(new Edge(n1, n2));
             }
-            boolean hasChanged = graphService.load(edges);
+            boolean hasChanged = graph.addEdges(edges);
             if (listener != null && hasChanged) {
-                listener.onGraphChanged(graphService.getNodes());
+                listener.onGraphChanged(graph.getNodes());
             }
         }
     }
@@ -96,15 +99,16 @@ public class MainInteractorImpl implements MainInteractor {
         }
 
         // shortest path to target
-        List<Node> path = graphService.shortestPath(selfNode, new Node(destId));
+        List<Node> path = graph.shortestPath(selfNode, new Node(destId));
         if (path == null || path.isEmpty()) {
             return null;
         }
 
-        byte[] newMessage = new byte[message.length + 2 + path.size()];
+        byte[] newMessage = new byte[message.length + 3 + path.size()];
         newMessage[0] = Message.TARGET_MESSAGE_CODE;
         newMessage[1] = userId;
-        int pos = 2;
+        newMessage[2] = (byte) path.size();
+        int pos = 3;
         for (Node node : path) {
             newMessage[pos++] = (byte) node.getId();
         }
@@ -114,7 +118,7 @@ public class MainInteractorImpl implements MainInteractor {
 
     @Override
     public byte[] getGraphBroadcastMessage() {
-        List<Pair<Node, Node>> edges = graphService.getEdges();
+        Set<Edge> edges = graph.getEdges();
         if (edges.isEmpty()) {
             return  null;
         }
@@ -124,16 +128,16 @@ public class MainInteractorImpl implements MainInteractor {
         message[0] = Message.BROADCAST_GRAPH_CODE;
         message[1] = userId;
         int pos = 2;
-        for (Pair<Node, Node> pair : edges) {
-            message[pos++] = (byte) pair.first.getId();
-            message[pos++] = (byte) pair.second.getId();
+        for (Edge edge : edges) {
+            message[pos++] = (byte) edge.getFrom().getId();
+            message[pos++] = (byte) edge.getTo().getId();
         }
         return message;
     }
 
     @Override
     public void saveGraph() {
-        graphService.save();
+        graphManager.save(graph);
     }
 
     @Override
@@ -142,7 +146,7 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     public interface OnGraphListener {
-        void onGraphChanged(List<Node> nodes);
+        void onGraphChanged(Set<Node> nodes);
         void onTick();
     }
 }

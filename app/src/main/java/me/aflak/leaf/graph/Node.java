@@ -1,5 +1,9 @@
 package me.aflak.leaf.graph;
 
+import java.util.Objects;
+
+import androidx.annotation.Nullable;
+
 public class Node {
     private int id;
     private String name;
@@ -28,5 +32,19 @@ public class Node {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Node)) {
+            return false;
+        }
+        Node n = (Node) obj;
+        return id == n.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }
