@@ -1,5 +1,7 @@
 package me.aflak.leaf.main.interactor;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,45 +26,52 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     @Override
-    public void setId(byte id) {
-        userId = id;
-        selfNode = new Node(userId);
-        graph.addNode(selfNode);
-    }
-
-    @Override
-    public byte getId() {
-        return userId;
-    }
-
-    @Override
     public Message parseMessage(byte[] message) {
         if (message.length < 2) {
             return null;
         }
         byte[] data = new byte[message.length - 2];
         System.arraycopy(message, 2, data, 0, message.length - 2);
-        Message msg = new Message(message[0], message[1], data);
-        graph.connect(selfNode, new Node(msg.getSourceId()));
-        return msg;
+        return new Message(message[0], message[1], data);
     }
 
     @Override
-    public void processReceivedGraph(Message message) {
-        Set<Edge> edges = new HashSet<>();
+    public void updateGraph(Message message) {
+        byte code = message.getCode();
         byte[] data = message.getData();
 
-        edges.add(new Edge(selfNode, new Node(message.getSourceId())));
-        for (int i = 0; i < data.length; i += 2) {
-            Node n1 = new Node(data[i]);
-            Node n2 = new Node(data[i + 1]);
-            edges.add(new Edge(n1, n2));
+        boolean hasChanged = false;
+        if (code == Message.BROADCAST_MESSAGE_CODE) {
+            hasChanged = graph.connect(selfNode, new Node(message.getSourceId()));
+        } else if (code == Message.BROADCAST_GRAPH_CODE) {
+            Set<Edge> edges = Collections.singleton(new Edge(selfNode, new Node(message.getSourceId())));
+            for (int i=0 ; i<data.length ; i+=2) {
+                Node n1 = new Node(data[i]);
+                Node n2 = new Node(data[i + 1]);
+                edges.add(new Edge(n1, n2));
+            }
+            hasChanged = graph.addEdges(edges);
         }
 
-        boolean hasChanged = graph.addEdges(edges);
         if (listener != null && hasChanged) {
             listener.onGraphChanged(graph.getNodes());
         }
+    }
+
+    @Override
+    public byte[] getDataFromTargetedMessage(Message message) {
+        byte[] data = message.getData();
+        int startIndex = data[0] + 1;
+        byte[] content = new byte[data.length - startIndex];
+        System.arraycopy(data, startIndex, content, 0, content.length);
+        return content;
+    }
+
+    @Override
+    public boolean isTarget(Message message) {
+        byte[] data = message.getData();
+        byte nodeCount = data[0];
+        return userId == data[nodeCount];
     }
 
     @Override
@@ -94,7 +103,30 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     @Override
-    public boolean shouldBroadcast(Message message) {
+    public byte[] getGraphBroadcastMessage() {
+        Set<Edge> edges = graph.getEdges();
+        int byteCount = 2 * edges.size() + 2;
+        byte[] message = new byte[byteCount];
+        message[0] = Message.BROADCAST_GRAPH_CODE;
+        message[1] = userId;
+        int pos = 2;
+        for (Edge edge : edges) {
+            message[pos++] = (byte) edge.getFrom().getId();
+            message[pos++] = (byte) edge.getTo().getId();
+        }
+        return message;
+    }
+
+    @Override
+    public byte[] getGraphForwardMessage(Message message) {
+        byte[] data = message.getData();
+        byte[] newMessage = Arrays.copyOf(data, data.length);
+        newMessage[1] = userId;
+        return newMessage;
+    }
+
+    @Override
+    public boolean shouldForwardGraph(Message message) {
         byte[] data = message.getData();
         byte nodeCount = data[0];
         int sourcePos = -1;
@@ -110,25 +142,15 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     @Override
-    public boolean isTarget(Message message) {
-        byte[] data = message.getData();
-        byte nodeCount = data[0];
-        return userId == data[nodeCount];
+    public void setId(byte id) {
+        userId = id;
+        selfNode = new Node(userId);
+        graph.addNode(selfNode);
     }
 
     @Override
-    public byte[] getGraphBroadcastMessage() {
-        Set<Edge> edges = graph.getEdges();
-        int byteCount = 2 * edges.size() + 2;
-        byte[] message = new byte[byteCount];
-        message[0] = Message.BROADCAST_GRAPH_CODE;
-        message[1] = userId;
-        int pos = 2;
-        for (Edge edge : edges) {
-            message[pos++] = (byte) edge.getFrom().getId();
-            message[pos++] = (byte) edge.getTo().getId();
-        }
-        return message;
+    public byte getId() {
+        return userId;
     }
 
     @Override

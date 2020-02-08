@@ -57,29 +57,19 @@ public class MainPresenterImpl implements MainPresenter {
 
             @Override
             public void onArduinoMessage(byte[] data) {
-                Log.d(getClass().getName(), Arrays.toString(data));
                 Message message = interactor.parseMessage(data);
                 if (message != null) {
+                    interactor.updateGraph(message);
                     if (message.getCode() == Message.TARGET_MESSAGE_CODE) {
-                        byte[] msg = message.getData();
-                        boolean shouldBroadcast = interactor.shouldBroadcast(message);
-                        if (shouldBroadcast) {
-                            byte[] newMessage = new byte[msg.length + 2];
-                            newMessage[0] = message.getCode();
-                            newMessage[1] = interactor.getId();
-                            System.arraycopy(msg, 0, newMessage, 2, msg.length);
-                            byte[] arduinoMessage = Utils.formatArduinoMessage(newMessage);
-                            arduino.send(arduinoMessage);
-                        } else if (interactor.isTarget(message)) {
-                            int startIndex = msg[0] + 1;
-                            byte[] newMessage = new byte[msg.length - startIndex];
-                            System.arraycopy(msg, startIndex, newMessage, 0, newMessage.length);
-                            view.appendChatMessage("[" + message.getSourceId() + "] -> [" + interactor.getId() + "] [" + new String(newMessage) + "]");
+                        if (interactor.isTarget(message)) {
+                            byte[] content = interactor.getDataFromTargetedMessage(message);
+                            view.appendChatMessage("[" + message.getSourceId() + "] -> [" + interactor.getId() + "] [" + new String(content) + "]");
+                        } else if (interactor.shouldForwardGraph(message)) {
+                            byte[] content = interactor.getGraphForwardMessage(message);
+                            arduino.send(Utils.formatArduinoMessage(content));
                         }
                     } else if (message.getCode() == Message.BROADCAST_MESSAGE_CODE) {
                         view.appendChatMessage("[" + message.getSourceId() + "] -> [0] [" + new String(message.getData()) + "]");
-                    } else if (message.getCode() == Message.BROADCAST_GRAPH_CODE) {
-                        interactor.processReceivedGraph(message);
                     }
                 }
             }
@@ -138,7 +128,6 @@ public class MainPresenterImpl implements MainPresenter {
     private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {
         @Override
         public void onGraphChanged(Set<Node> nodes) {
-            Log.d(getClass().getName(), "On Graph Changed");
             List<Integer> ids = new ArrayList<>();
             for (Node n : nodes) {
                 ids.add(n.getId());

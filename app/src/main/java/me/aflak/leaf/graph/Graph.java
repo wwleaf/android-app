@@ -33,12 +33,6 @@ public class Graph {
         return edges;
     }
 
-    public void addEdge(Edge edge) {
-        this.nodes.add(edge.getFrom());
-        this.nodes.add(edge.getTo());
-        this.edges.add(edge);
-    }
-
     public boolean addEdges(Set<Edge> edges) {
         boolean changed = false;
         for (Edge edge : edges) {
@@ -52,10 +46,15 @@ public class Graph {
         return changed;
     }
 
-    public void connect(Node from, Node to) {
+    public boolean connect(Node from, Node to) {
         nodes.add(from);
         nodes.add(to);
-        edges.add(new Edge(from, to));
+        Edge edge = new Edge(from, to);
+        if (!edges.contains(edge)) {
+            edges.add(edge);
+            return true;
+        }
+        return false;
     }
 
     public List<Node> shortestPath(Node from, Node to) {
