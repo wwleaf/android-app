@@ -5,7 +5,6 @@ public class Message {
     public final static byte BROADCAST_GRAPH_CODE = 127;
     public final static byte BROADCAST_MESSAGE_CODE = 126;
     public final static byte TARGET_MESSAGE_CODE = 125;
-    public final static byte DISCOVER_CODE = 124;
 
     private byte code;
     private byte sourceId;

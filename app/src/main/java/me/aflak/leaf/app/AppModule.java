@@ -15,22 +15,22 @@ import dagger.Provides;
 public class AppModule {
     private Context context;
 
-    public AppModule(Context context) {
+    AppModule(Context context) {
         this.context = context;
     }
 
     @Provides @Singleton
-    public Context provideContext() {
+    Context provideContext() {
         return context;
     }
 
     @Provides @Singleton
-    public SharedPreferences provideSharedPreferences(Context context) {
+    SharedPreferences provideSharedPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Provides @Singleton
-    public Gson provideGson() {
+    Gson provideGson() {
         return new Gson();
     }
 }
