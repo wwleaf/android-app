@@ -2,9 +2,10 @@ package me.aflak.leaf.main.presenter;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
-import android.os.Handler;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -127,6 +128,7 @@ public class MainPresenterImpl implements MainPresenter {
 
     private void broadcastGraph() {
         byte[] message = interactor.getGraphBroadcastMessage();
+        Log.d(getClass().getName(), "broadcasting: "+ Arrays.toString(message));
         if (message != null) {
             byte[] data = Utils.formatArduinoMessage(message);
             arduino.send(data);

@@ -51,17 +51,17 @@ public class MainInteractorImpl implements MainInteractor {
     public void processReceivedGraph(Message message) {
         Set<Edge> edges = new HashSet<>();
         byte[] data = message.getData();
-        if (data.length % 2 == 0) {
-            edges.add(new Edge(selfNode, new Node(message.getSourceId())));
-            for (int i = 0; i < data.length; i += 2) {
-                Node n1 = new Node(data[i]);
-                Node n2 = new Node(data[i + 1]);
-                edges.add(new Edge(n1, n2));
-            }
-            boolean hasChanged = graph.addEdges(edges);
-            if (listener != null && hasChanged) {
-                listener.onGraphChanged(graph.getNodes());
-            }
+
+        edges.add(new Edge(selfNode, new Node(message.getSourceId())));
+        for (int i = 0; i < data.length; i += 2) {
+            Node n1 = new Node(data[i]);
+            Node n2 = new Node(data[i + 1]);
+            edges.add(new Edge(n1, n2));
+        }
+
+        boolean hasChanged = graph.addEdges(edges);
+        if (listener != null && hasChanged) {
+            listener.onGraphChanged(graph.getNodes());
         }
     }
 
@@ -119,10 +119,6 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public byte[] getGraphBroadcastMessage() {
         Set<Edge> edges = graph.getEdges();
-        if (edges.isEmpty()) {
-            return  null;
-        }
-
         int byteCount = 2 * edges.size() + 2;
         byte[] message = new byte[byteCount];
         message[0] = Message.BROADCAST_GRAPH_CODE;
