@@ -2,7 +2,6 @@ package me.aflak.leaf.main.presenter;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +34,7 @@ public class MainPresenterImpl implements MainPresenter {
 
         arduino = new Arduino(context);
         interactor.setOnGraphListener(onGraphListener);
+        view.showId(interactor.getId());
     }
 
     @Override

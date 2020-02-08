@@ -7,14 +7,12 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -145,6 +143,11 @@ public class MainActivity extends AppCompatActivity implements MainView {
             }
         }
         chatFragment.appendMessage(builder.toString());
+    }
+
+    @Override
+    public void showId(byte id) {
+        userId.setText(String.valueOf(id));
     }
 
     private ChatFragment.OnChatListener chatListener = (message, destId) -> presenter.onMessage(message, destId);

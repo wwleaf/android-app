@@ -10,18 +10,22 @@ import me.aflak.leaf.graph.Edge;
 import me.aflak.leaf.graph.Graph;
 import me.aflak.leaf.graph.GraphManager;
 import me.aflak.leaf.graph.Node;
+import me.aflak.leaf.main.dagger.UserManager;
 
 public class MainInteractorImpl implements MainInteractor {
     private GraphManager graphManager;
+    private UserManager userManager;
+
     private OnGraphListener listener;
     private Graph graph;
     private byte userId;
     private Node selfNode;
 
-    public MainInteractorImpl(GraphManager graphManager) {
+    public MainInteractorImpl(GraphManager graphManager, UserManager userManager) {
         this.graphManager = graphManager;
+        this.userManager = userManager;
         this.graph = graphManager.load();
-        this.userId = 1;
+        this.userId = -1;
     }
 
     @Override
@@ -144,12 +148,15 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public void setId(byte id) {
         userId = id;
+        userManager.setId(userId);
         selfNode = new Node(userId);
-        graph.addNode(selfNode);
     }
 
     @Override
     public byte getId() {
+        if (userId == -1) {
+            userId = userManager.getId();
+        }
         return userId;
     }
 

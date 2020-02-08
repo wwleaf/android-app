@@ -1,5 +1,7 @@
 package me.aflak.leaf.main.dagger;
 
+import android.content.SharedPreferences;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -26,13 +28,18 @@ public class MainModule {
     }
 
     @Provides @Singleton
-    MainInteractor provideMainInteractor(GraphManager graphManager) {
-        return new MainInteractorImpl(graphManager);
+    MainInteractor provideMainInteractor(GraphManager graphManager, UserManager userManager) {
+        return new MainInteractorImpl(graphManager, userManager);
     }
 
     @Provides @Singleton
     MainPresenter provideMainPresenter(MainView view, MainInteractor interactor) {
         return new MainPresenterImpl(view, interactor);
+    }
+
+    @Provides @Singleton
+    UserManager provideUserManager(SharedPreferences sharedPreferences) {
+        return new UserManager(sharedPreferences);
     }
 
     @Provides @Singleton

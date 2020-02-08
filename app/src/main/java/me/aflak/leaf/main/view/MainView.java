@@ -12,5 +12,6 @@ public interface MainView {
     void hideChat();
     void appendChatMessage(String message);
     void showUsers(List<Integer> users);
+    void showId(byte id);
     void clearInput();
 }
