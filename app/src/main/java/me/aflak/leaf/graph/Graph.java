@@ -45,7 +45,7 @@ public class Graph {
             if (!this.edges.contains(edge)) {
                 this.nodes.add(edge.getFrom());
                 this.nodes.add(edge.getTo());
-                edges.add(edge);
+                this.edges.add(edge);
                 changed = true;
             }
         }

@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         for (int i=0 ; i<users.size() ; i++) {
             builder.append("[");
             builder.append(users.get(i));
-            builder.append("] detected");
+            builder.append("] online");
             if (i < users.size() - 1) {
                 builder.append("\n");
             }

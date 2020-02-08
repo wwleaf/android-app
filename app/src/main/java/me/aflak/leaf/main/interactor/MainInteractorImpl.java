@@ -37,7 +37,7 @@ public class MainInteractorImpl implements MainInteractor {
 
     @Override
     public Message parseMessage(byte[] message) {
-        if (message.length < 3) {
+        if (message.length < 2) {
             return null;
         }
         byte[] data = new byte[message.length - 2];

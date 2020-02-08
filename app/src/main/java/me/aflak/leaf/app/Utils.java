@@ -5,7 +5,7 @@ import android.os.Handler;
 public class Utils {
     public static void executeNTimes(int n, int intervalMs, Runnable runnable) {
         class Counter {
-            int i = 0;
+            int i = 1;
         }
 
         final Counter counter = new Counter();

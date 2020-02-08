@@ -35,7 +35,9 @@ public class Edge {
         }
 
         Edge e = (Edge) obj;
-        return e.getFrom().equals(from) && e.getTo().equals(to);
+        boolean b1 = e.getFrom().equals(from) && e.getTo().equals(to);
+        boolean b2 = e.getFrom().equals(to) && e.getTo().equals(from);
+        return b1 || b2;
     }
 
     @Override

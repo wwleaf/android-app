@@ -13,7 +13,7 @@ public class GraphManager {
     private SharedPreferences sharedPreferences;
     private Gson gson;
 
-    public GraphManager(SharedPreferences sharedPreferences, Gson gson) {
+    GraphManager(SharedPreferences sharedPreferences, Gson gson) {
         this.sharedPreferences = sharedPreferences;
         this.gson = gson;
     }

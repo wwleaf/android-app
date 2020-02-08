@@ -21,22 +21,22 @@ public class MainModule {
     }
 
     @Provides @Singleton
-    public MainView provideMainView() {
+    MainView provideMainView() {
         return view;
     }
 
     @Provides @Singleton
-    public MainInteractor provideMainInteractor(GraphManager graphManager) {
+    MainInteractor provideMainInteractor(GraphManager graphManager) {
         return new MainInteractorImpl(graphManager);
     }
 
     @Provides @Singleton
-    public MainPresenter provideMainPresenter(MainView view, MainInteractor interactor) {
+    MainPresenter provideMainPresenter(MainView view, MainInteractor interactor) {
         return new MainPresenterImpl(view, interactor);
     }
 
     @Provides @Singleton
-    public ChatFragment provideChatFragment() {
+    ChatFragment provideChatFragment() {
         return new ChatFragment();
     }
 }

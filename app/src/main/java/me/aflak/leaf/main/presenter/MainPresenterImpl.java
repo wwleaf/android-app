@@ -57,6 +57,7 @@ public class MainPresenterImpl implements MainPresenter {
 
             @Override
             public void onArduinoMessage(byte[] data) {
+                Log.d(getClass().getName(), Arrays.toString(data));
                 Message message = interactor.parseMessage(data);
                 if (message != null) {
                     if (message.getCode() == Message.TARGET_MESSAGE_CODE) {
@@ -128,7 +129,6 @@ public class MainPresenterImpl implements MainPresenter {
 
     private void broadcastGraph() {
         byte[] message = interactor.getGraphBroadcastMessage();
-        Log.d(getClass().getName(), "broadcasting: "+ Arrays.toString(message));
         if (message != null) {
             byte[] data = Utils.formatArduinoMessage(message);
             arduino.send(data);
@@ -138,6 +138,7 @@ public class MainPresenterImpl implements MainPresenter {
     private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {
         @Override
         public void onGraphChanged(Set<Node> nodes) {
+            Log.d(getClass().getName(), "On Graph Changed");
             List<Integer> ids = new ArrayList<>();
             for (Node n : nodes) {
                 ids.add(n.getId());
