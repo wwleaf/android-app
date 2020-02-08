@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -128,7 +129,16 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showUsers(List<Integer> users) {
-        // show users
+        StringBuilder builder = new StringBuilder();
+        for (int i=0 ; i<users.size() ; i++) {
+            builder.append("[");
+            builder.append(users.get(i));
+            builder.append("] detected");
+            if (i < users.size() - 1) {
+                builder.append("\n");
+            }
+        }
+        chatFragment.appendMessage(builder.toString());
     }
 
     private ChatFragment.OnChatListener chatListener = (message, destId) -> presenter.onMessage(message, destId);

@@ -35,7 +35,7 @@ public class ChatFragment extends Fragment {
     }
 
     @OnClick(R.id.chat_send)
-    public void onSendMessage() {
+    void onSendMessage() {
         if (listener != null) {
             String message = input.getText().toString();
             int destId = Integer.parseInt(destination.getText().toString());
@@ -43,16 +43,16 @@ public class ChatFragment extends Fragment {
         }
     }
 
-    public void appendMessage(String message) {
+    void appendMessage(String message) {
         final String text = chat.getText().toString() + "\n" + message;
         Objects.requireNonNull(getActivity()).runOnUiThread(() -> chat.setText(text));
     }
 
-    public void clearInput() {
+    void clearInput() {
         Objects.requireNonNull(getActivity()).runOnUiThread(() -> input.setText(""));
     }
 
-    public void setListener(OnChatListener listener) {
+    void setListener(OnChatListener listener) {
         this.listener = listener;
     }
 

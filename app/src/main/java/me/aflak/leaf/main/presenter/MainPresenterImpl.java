@@ -85,7 +85,7 @@ public class MainPresenterImpl implements MainPresenter {
             @Override
             public void onArduinoOpened() {
                 view.showChat();
-                broadcastGraphNTimes(5, 1000 * 10);
+                me.aflak.leaf.app.Utils.executeNTimes(5, 1000 * 10, () -> broadcastGraph());
             }
 
             @Override
@@ -123,25 +123,6 @@ public class MainPresenterImpl implements MainPresenter {
         } else {
             view.showMessage("Invalid destination id");
         }
-    }
-
-    private void broadcastGraphNTimes(int n, int intervalMs) {
-        class Counter {
-            int i = 0;
-        }
-
-        final Counter count = new Counter();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                broadcastGraph();
-                if (count.i < n) {
-                    count.i += 1;
-                    handler.postDelayed(this, intervalMs);
-                }
-            }
-        }, intervalMs);
     }
 
     private void broadcastGraph() {
