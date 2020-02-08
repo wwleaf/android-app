@@ -147,8 +147,8 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     @Override
-    public void setId(byte id) {
-        userId = id;
+    public void setId(int id) {
+        userId = (byte) id;
         userManager.setId(userId);
         selfNode = new Node(userId);
     }
@@ -159,6 +159,11 @@ public class MainInteractorImpl implements MainInteractor {
             userId = userManager.getId();
         }
         return userId;
+    }
+
+    @Override
+    public boolean isValidId(int id) {
+        return id > 0 && id <= 127;
     }
 
     @Override

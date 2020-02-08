@@ -15,8 +15,9 @@ public interface MainInteractor {
     byte[] getGraphForwardMessage(Message message);
     boolean shouldForwardGraph(Message message);
 
-    void setId(byte id);
+    void setId(int id);
     byte getId();
+    boolean isValidId(int id);
     void saveGraph();
     void setOnGraphListener(MainInteractorImpl.OnGraphListener listener);
 }

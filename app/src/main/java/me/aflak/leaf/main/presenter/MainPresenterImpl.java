@@ -98,8 +98,8 @@ public class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void onConnectClicked(int id) {
-        if (id > 0 && id <= 127) {
-            interactor.setId((byte) id);
+        if (interactor.isValidId(id)) {
+            interactor.setId(id);
             arduino.open(device);
         } else {
             view.showMessage("Invalid id");
