@@ -120,8 +120,7 @@ public class MainPresenterImpl implements MainPresenter {
     private void broadcastGraph() {
         byte[] message = interactor.getGraphBroadcastMessage();
         if (message != null) {
-            byte[] data = Utils.formatArduinoMessage(message);
-            arduino.send(data);
+            arduino.send(Utils.formatArduinoMessage(message));
         }
     }
 

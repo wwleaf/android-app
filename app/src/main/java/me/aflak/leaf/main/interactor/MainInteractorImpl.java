@@ -2,7 +2,6 @@ package me.aflak.leaf.main.interactor;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,8 +38,8 @@ public class MainInteractorImpl implements MainInteractor {
     public void updateGraph(Message message) {
         byte code = message.getCode();
         byte[] data = message.getData();
-
         boolean hasChanged = false;
+
         if (code == Message.BROADCAST_MESSAGE_CODE) {
             hasChanged = graph.connect(selfNode, new Node(message.getSourceId()));
         } else if (code == Message.BROADCAST_GRAPH_CODE) {
