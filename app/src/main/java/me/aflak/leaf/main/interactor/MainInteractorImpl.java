@@ -1,7 +1,7 @@
 package me.aflak.leaf.main.interactor;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -43,7 +43,8 @@ public class MainInteractorImpl implements MainInteractor {
         if (code == Message.BROADCAST_MESSAGE_CODE) {
             hasChanged = graph.connect(selfNode, new Node(message.getSourceId()));
         } else if (code == Message.BROADCAST_GRAPH_CODE) {
-            Set<Edge> edges = Collections.singleton(new Edge(selfNode, new Node(message.getSourceId())));
+            Set<Edge> edges = new HashSet<>();
+            edges.add(new Edge(selfNode, new Node(message.getSourceId())));
             for (int i=0 ; i<data.length ; i+=2) {
                 Node n1 = new Node(data[i]);
                 Node n2 = new Node(data[i + 1]);
