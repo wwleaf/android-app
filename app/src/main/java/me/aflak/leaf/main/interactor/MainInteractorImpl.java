@@ -1,7 +1,5 @@
 package me.aflak.leaf.main.interactor;
 
-import android.os.Handler;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,27 +11,16 @@ import me.aflak.leaf.graph.GraphManager;
 import me.aflak.leaf.graph.Node;
 
 public class MainInteractorImpl implements MainInteractor {
-    private final static int INTERVAL_MS = 1000 * 60 * 5;
-
     private GraphManager graphManager;
     private OnGraphListener listener;
     private Graph graph;
-    private Handler handler;
-    private Runnable handlerTask;
-    private byte userId = 1;
+    private byte userId;
     private Node selfNode;
 
     public MainInteractorImpl(GraphManager graphManager) {
         this.graphManager = graphManager;
         this.graph = graphManager.load();
-
-        handler = new Handler();
-        handlerTask = () -> {
-            if (listener != null) {
-                listener.onTick();
-            }
-            handler.postDelayed(handlerTask, INTERVAL_MS);
-        };
+        this.userId = 1;
     }
 
     @Override
@@ -46,16 +33,6 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public byte getId() {
         return userId;
-    }
-
-    @Override
-    public void startTimer() {
-        handlerTask.run();
-    }
-
-    @Override
-    public void stopTimer() {
-        handler.removeCallbacks(handlerTask);
     }
 
     @Override
@@ -170,6 +147,5 @@ public class MainInteractorImpl implements MainInteractor {
 
     public interface OnGraphListener {
         void onGraphChanged(Set<Node> nodes);
-        void onTick();
     }
 }

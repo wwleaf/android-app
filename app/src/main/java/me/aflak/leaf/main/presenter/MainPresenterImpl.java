@@ -2,6 +2,7 @@ package me.aflak.leaf.main.presenter;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
+import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,6 @@ public class MainPresenterImpl implements MainPresenter {
 
         arduino = new Arduino(context);
         interactor.setOnGraphListener(onGraphListener);
-        interactor.startTimer();
     }
 
     @Override
@@ -85,6 +85,7 @@ public class MainPresenterImpl implements MainPresenter {
             @Override
             public void onArduinoOpened() {
                 view.showChat();
+                broadcastGraphNTimes(5, 1000 * 10);
             }
 
             @Override
@@ -96,7 +97,6 @@ public class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void onDestroy() {
-        interactor.stopTimer();
         interactor.saveGraph();
         arduino.unsetArduinoListener();
         arduino.close();
@@ -125,6 +125,33 @@ public class MainPresenterImpl implements MainPresenter {
         }
     }
 
+    private void broadcastGraphNTimes(int n, int intervalMs) {
+        class Counter {
+            int i = 0;
+        }
+
+        final Counter count = new Counter();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                broadcastGraph();
+                if (count.i < n) {
+                    count.i += 1;
+                    handler.postDelayed(this, intervalMs);
+                }
+            }
+        }, intervalMs);
+    }
+
+    private void broadcastGraph() {
+        byte[] message = interactor.getGraphBroadcastMessage();
+        if (message != null) {
+            byte[] data = Utils.formatArduinoMessage(message);
+            arduino.send(data);
+        }
+    }
+
     private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {
         @Override
         public void onGraphChanged(Set<Node> nodes) {
@@ -133,15 +160,7 @@ public class MainPresenterImpl implements MainPresenter {
                 ids.add(n.getId());
             }
             view.showUsers(ids);
-        }
-
-        @Override
-        public void onTick() {
-            byte[] message = interactor.getGraphBroadcastMessage();
-            if (message != null) {
-                byte[] data = Utils.formatArduinoMessage(message);
-                arduino.send(data);
-            }
+            broadcastGraph();
         }
     };
 }
