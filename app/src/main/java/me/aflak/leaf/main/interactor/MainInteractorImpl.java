@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import me.aflak.leaf.arduino.Message;
+import me.aflak.leaf.arduino.Utils;
 import me.aflak.leaf.graph.Edge;
 import me.aflak.leaf.graph.Graph;
 import me.aflak.leaf.graph.GraphManager;
@@ -85,7 +86,7 @@ public class MainInteractorImpl implements MainInteractor {
             newMessage[0] = Message.BROADCAST_MESSAGE_CODE;
             newMessage[1] = userId;
             System.arraycopy(message, 0, newMessage, 2, message.length);
-            return newMessage;
+            return Utils.formatArduinoMessage(newMessage);
         }
 
         // shortest path to target
@@ -103,7 +104,7 @@ public class MainInteractorImpl implements MainInteractor {
             newMessage[pos++] = (byte) node.getId();
         }
         System.arraycopy(message, 0, newMessage, pos, message.length);
-        return newMessage;
+        return Utils.formatArduinoMessage(newMessage);
     }
 
     @Override
@@ -118,7 +119,7 @@ public class MainInteractorImpl implements MainInteractor {
             message[pos++] = (byte) edge.getFrom().getId();
             message[pos++] = (byte) edge.getTo().getId();
         }
-        return message;
+        return Utils.formatArduinoMessage(message);
     }
 
     @Override
@@ -126,7 +127,7 @@ public class MainInteractorImpl implements MainInteractor {
         byte[] data = message.getData();
         byte[] newMessage = Arrays.copyOf(data, data.length);
         newMessage[1] = userId;
-        return newMessage;
+        return Utils.formatArduinoMessage(newMessage);
     }
 
     @Override

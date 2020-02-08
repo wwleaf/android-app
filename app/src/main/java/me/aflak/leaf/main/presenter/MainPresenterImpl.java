@@ -64,8 +64,7 @@ public class MainPresenterImpl implements MainPresenter {
                             byte[] content = interactor.getDataFromTargetedMessage(message);
                             view.appendChatMessage("[" + message.getSourceId() + "] -> [" + interactor.getId() + "] [" + new String(content) + "]");
                         } else if (interactor.shouldForwardGraph(message)) {
-                            byte[] content = interactor.getGraphForwardMessage(message);
-                            arduino.send(Utils.formatArduinoMessage(content));
+                            arduino.send(interactor.getGraphForwardMessage(message));
                         }
                     } else if (message.getCode() == Message.BROADCAST_MESSAGE_CODE) {
                         view.appendChatMessage("[" + message.getSourceId() + "] -> [0] [" + new String(message.getData()) + "]");
@@ -113,7 +112,6 @@ public class MainPresenterImpl implements MainPresenter {
         if (data != null) {
             view.clearInput();
             view.appendChatMessage("[" + interactor.getId() + "] -> [" + destId + "] [" + message + "]");
-            data = Utils.formatArduinoMessage(data);
             arduino.send(data);
         } else {
             view.showMessage("Invalid destination id");
@@ -123,7 +121,7 @@ public class MainPresenterImpl implements MainPresenter {
     private void broadcastGraph() {
         byte[] message = interactor.getGraphBroadcastMessage();
         if (message != null) {
-            arduino.send(Utils.formatArduinoMessage(message));
+            arduino.send(message);
         }
     }
 
