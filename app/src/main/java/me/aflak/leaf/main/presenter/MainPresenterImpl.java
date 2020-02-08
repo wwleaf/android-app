@@ -5,7 +5,6 @@ import android.hardware.usb.UsbDevice;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -88,8 +87,12 @@ public class MainPresenterImpl implements MainPresenter {
     }
 
     @Override
-    public void onDestroy() {
+    public void onPause() {
         interactor.saveGraph();
+    }
+
+    @Override
+    public void onDestroy() {
         arduino.unsetArduinoListener();
         arduino.close();
     }

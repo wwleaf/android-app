@@ -9,6 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
+        android:gravity="bottom"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@id/chat_input_layout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
@@ -18,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:padding="6dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <EditText
@@ -44,8 +47,7 @@
             android:layout_weight="1"
             android:src="@drawable/send"
             android:tint="@color/chat_send"
-            android:background="@null"
-            android:layout_margin="6dp"/>
+            android:background="@null"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
