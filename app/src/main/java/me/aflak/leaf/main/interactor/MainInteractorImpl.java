@@ -82,29 +82,35 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public byte[] formatMessage(byte[] message, int destId) {
         if (destId == Message.BROADCAST_ID) {
-            byte[] newMessage = new byte[message.length + 2];
-            newMessage[0] = Message.BROADCAST_MESSAGE_CODE;
-            newMessage[1] = userId;
-            System.arraycopy(message, 0, newMessage, 2, message.length);
-            return Utils.formatArduinoMessage(newMessage);
+            return formatBroadcastMessage(message);
         }
+        return formatTargetedMessage(message, destId);
+    }
 
-        // shortest path to target
+    private byte[] formatBroadcastMessage(byte[] message) {
+        byte[] data = new byte[2 + message.length];
+        data[0] = Message.BROADCAST_MESSAGE_CODE;
+        data[1] = userId;
+        System.arraycopy(message, 0, data, 2, message.length);
+        return Utils.formatArduinoMessage(data);
+    }
+
+    private byte[] formatTargetedMessage(byte[] message, int destId) {
         List<Node> path = graph.shortestPath(selfNode, new Node(destId));
         if (path == null || path.isEmpty()) {
             return null;
         }
 
-        byte[] newMessage = new byte[3 + path.size() + message.length];
-        newMessage[0] = Message.TARGET_MESSAGE_CODE;
-        newMessage[1] = userId;
-        newMessage[2] = (byte) path.size();
+        byte[] data = new byte[3 + path.size() + message.length];
+        data[0] = Message.TARGET_MESSAGE_CODE;
+        data[1] = userId;
+        data[2] = (byte) path.size();
         int pos = 3;
         for (Node node : path) {
-            newMessage[pos++] = (byte) node.getId();
+            data[pos++] = (byte) node.getId();
         }
-        System.arraycopy(message, 0, newMessage, pos, message.length);
-        return Utils.formatArduinoMessage(newMessage);
+        System.arraycopy(message, 0, data, pos, message.length);
+        return Utils.formatArduinoMessage(data);
     }
 
     @Override
