@@ -10,7 +10,6 @@ import java.util.Set;
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
 import me.aflak.leaf.arduino.Message;
-import me.aflak.leaf.arduino.Utils;
 import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.interactor.MainInteractor;
 import me.aflak.leaf.main.interactor.MainInteractorImpl;
@@ -35,6 +34,7 @@ public class MainPresenterImpl implements MainPresenter {
         arduino = new Arduino(context);
         interactor.setOnGraphListener(onGraphListener);
         view.showId(interactor.getId());
+        view.showChat();
     }
 
     @Override

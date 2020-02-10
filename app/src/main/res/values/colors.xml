@@ -6,6 +6,4 @@
 
     <color name="connection_usb_icon_disconnected">#EE2F54</color>
     <color name="connection_usb_icon_connected">#4BF5A2</color>
-
-    <color name="chat_send">#3F51B5</color>
 </resources>
