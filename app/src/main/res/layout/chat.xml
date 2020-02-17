@@ -52,7 +52,7 @@
             android:src="@drawable/send"
             android:tint="@android:color/white"
             android:background="@drawable/rounded"
-            android:backgroundTint="@color/colorAccent"/>
+            android:backgroundTint="@color/colorPrimaryDark"/>
     </LinearLayout>
 
 </RelativeLayout>

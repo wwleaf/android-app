@@ -81,11 +81,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showConnectedIcon() {
+        textInfo.setText(R.string.connection_leaf_plugged);
         textInfo.setTextColor(ContextCompat.getColor(this, R.color.connection_leaf_plugged));
     }
 
     @Override
     public void showDisconnectedIcon() {
+        textInfo.setText(R.string.connection_leaf_unplugged);
         textInfo.setTextColor(ContextCompat.getColor(this, R.color.connection_leaf_unplugged));
     }
 
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void hideConnectButton() {
-        connectArduinoLayout.setVisibility(View.GONE);
+        connectArduinoLayout.setVisibility(View.INVISIBLE);
     }
 
     @Override
