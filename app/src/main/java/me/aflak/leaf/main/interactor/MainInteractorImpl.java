@@ -43,17 +43,26 @@ public class MainInteractorImpl implements MainInteractor {
     public void updateGraph(Message message) {
         byte code = message.getCode();
         byte[] data = message.getData();
+        byte sourceId = message.getSourceId();
         boolean hasChanged = false;
 
         if (code == Message.BROADCAST_MESSAGE_CODE) {
-            hasChanged = graph.connect(selfNode, new Node(message.getSourceId()));
+            hasChanged = graph.connect(selfNode, new Node(sourceId));
         } else if (code == Message.BROADCAST_GRAPH_CODE) {
             Set<Edge> edges = new HashSet<>();
-            edges.add(new Edge(selfNode, new Node(message.getSourceId())));
+            edges.add(new Edge(selfNode, new Node(sourceId)));
             for (int i=0 ; i<data.length ; i+=2) {
                 Node n1 = new Node(data[i]);
                 Node n2 = new Node(data[i + 1]);
                 edges.add(new Edge(n1, n2));
+            }
+            hasChanged = graph.addEdges(edges);
+        } else if (code == Message.TARGET_MESSAGE_CODE) {
+            Set<Edge> edges = new HashSet<>();
+            edges.add(new Edge(selfNode, new Node(sourceId)));
+            byte nodeCount = data[0];
+            for (int i=1 ; i<nodeCount ; i++) {
+                edges.add(new Edge(new Node(data[i]), new Node(data[i + 1])));
             }
             hasChanged = graph.addEdges(edges);
         }
