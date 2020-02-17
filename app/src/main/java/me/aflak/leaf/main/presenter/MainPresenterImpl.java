@@ -30,6 +30,7 @@ public class MainPresenterImpl implements MainPresenter {
     public void onCreate(Context context) {
         view.hideConnectButton();
         view.hideChat();
+        view.showDisconnectedIcon();
 
         arduino = new Arduino(context);
         interactor.setOnGraphListener(onGraphListener);

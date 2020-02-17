@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Leaf</string>
 
-    <string name="connection_connect_text">Plug Leaf to your Android</string>
+    <string name="connection_leaf_unplugged">Leaf, unplugged</string>
+    <string name="connection_leaf_plugged">Leaf is plugged in</string>
     <string name="connection_connect_button">Connect</string>
     <string name="chat_destination_hint">id</string>
     <string name="chat_destination_value">0</string>

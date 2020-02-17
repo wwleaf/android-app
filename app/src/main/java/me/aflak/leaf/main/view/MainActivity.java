@@ -10,7 +10,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -27,10 +28,10 @@ import me.aflak.leaf.main.dagger.MainModule;
 import me.aflak.leaf.main.presenter.MainPresenter;
 
 public class MainActivity extends AppCompatActivity implements MainView {
-    @BindView(R.id.connection_parent) ConstraintLayout connectionLayout;
-    @BindView(R.id.connection_usb_icon) ImageView icon;
-    @BindView(R.id.connection_connect_button) Button connect;
+    @BindView(R.id.connection_parent) LinearLayout connectionLayout;
+    @BindView(R.id.connection_connect_layout) LinearLayout connectArduinoLayout;
     @BindView(R.id.connection_id) EditText userId;
+    @BindView(R.id.connection_connect_text) TextView textInfo;
 
     @Inject ChatFragment chatFragment;
     @Inject MainPresenter presenter;
@@ -80,22 +81,22 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showConnectedIcon() {
-        icon.setColorFilter(ContextCompat.getColor(this, R.color.connection_usb_icon_connected));
+        textInfo.setTextColor(ContextCompat.getColor(this, R.color.connection_leaf_plugged));
     }
 
     @Override
     public void showDisconnectedIcon() {
-        icon.setColorFilter(ContextCompat.getColor(this, R.color.connection_usb_icon_disconnected));
+        textInfo.setTextColor(ContextCompat.getColor(this, R.color.connection_leaf_unplugged));
     }
 
     @Override
     public void showConnectButton() {
-        connect.setVisibility(View.VISIBLE);
+        connectArduinoLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideConnectButton() {
-        connect.setVisibility(View.GONE);
+        connectArduinoLayout.setVisibility(View.GONE);
     }
 
     @Override
