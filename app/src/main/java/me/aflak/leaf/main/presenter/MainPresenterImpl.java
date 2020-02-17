@@ -34,7 +34,6 @@ public class MainPresenterImpl implements MainPresenter {
         arduino = new Arduino(context);
         interactor.setOnGraphListener(onGraphListener);
         view.showId(interactor.getId());
-        view.showChat();
     }
 
     @Override
