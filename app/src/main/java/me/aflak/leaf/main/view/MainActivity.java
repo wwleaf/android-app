@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -153,5 +154,15 @@ public class MainActivity extends AppCompatActivity implements MainView {
         userId.setText(String.valueOf(id));
     }
 
-    private ChatFragment.OnChatListener chatListener = (message, destId) -> presenter.onMessage(message, destId);
+    private ChatFragment.OnChatListener chatListener = new ChatFragment.OnChatListener() {
+        @Override
+        public void onMessage(String message, int destId) {
+            presenter.onMessage(message, destId);
+        }
+
+        @Override
+        public void onToggle(boolean isChecked) {
+            presenter.onToggle(isChecked);
+        }
+    };
 }

@@ -1,5 +1,7 @@
 package me.aflak.leaf.main.interactor;
 
+import android.util.Log;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;

@@ -5,6 +5,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import me.aflak.leaf.R;
 
@@ -32,6 +34,13 @@ public class ChatFragment extends Fragment {
         ButterKnife.bind(this, view);
         chat.setMovementMethod(new ScrollingMovementMethod());
         return view;
+    }
+
+    @OnCheckedChanged(R.id.chat_toggle_debug)
+    void onToggled(CompoundButton button, boolean isChecked) {
+        if (listener != null) {
+            listener.onToggle(isChecked);
+        }
     }
 
     @OnClick(R.id.chat_send)
@@ -58,5 +67,6 @@ public class ChatFragment extends Fragment {
 
     interface OnChatListener {
         void onMessage(String message, int destId);
+        void onToggle(boolean isChecked);
     }
 }

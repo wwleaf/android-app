@@ -21,10 +21,12 @@ public class MainPresenterImpl implements MainPresenter {
     private MainInteractor interactor;
     private Arduino arduino;
     private UsbDevice device;
+    private boolean debugEnabled;
 
     public MainPresenterImpl(MainView view, MainInteractor interactor) {
         this.view = view;
         this.interactor = interactor;
+        debugEnabled = false;
     }
 
     @Override
@@ -57,7 +59,10 @@ public class MainPresenterImpl implements MainPresenter {
 
             @Override
             public void onArduinoMessage(byte[] data) {
-                view.appendChatMessage("DEBUG: "+ Arrays.toString(data));
+                if (debugEnabled) {
+                    view.appendChatMessage("DEBUG: " + Arrays.toString(data));
+                }
+
                 Message message = interactor.parseMessage(data);
                 if (message != null) {
                     interactor.updateGraph(message);
@@ -118,6 +123,11 @@ public class MainPresenterImpl implements MainPresenter {
         } else {
             view.showMessage("Invalid destination id");
         }
+    }
+
+    @Override
+    public void onToggle(boolean isChecked) {
+        debugEnabled = isChecked;
     }
 
     private void broadcastGraph() {

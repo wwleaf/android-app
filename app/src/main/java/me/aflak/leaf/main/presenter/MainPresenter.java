@@ -9,4 +9,5 @@ public interface MainPresenter {
     void onDestroy();
     void onConnectClicked(int id);
     void onMessage(String message, int destId);
+    void onToggle(boolean isChecked);
 }

@@ -4,15 +4,26 @@
     android:layout_height="match_parent"
     android:background="#EFEFEF">
 
+    <Switch
+        android:id="@+id/chat_toggle_debug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/chat_toggle_debug"
+        android:minWidth="90dp"
+        android:layout_margin="6dp"
+        android:layout_alignParentEnd="true"/>
+
     <TextView
         android:id="@+id/chat_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="20sp"
+        android:layout_above="@id/chat_input_layout"
+        android:layout_below="@id/chat_toggle_debug"
+        android:layout_marginBottom="-1dp"
         android:gravity="bottom"
-        android:scrollbars="vertical"
         android:padding="16dp"
-        android:layout_above="@id/chat_input_layout"/>
+        android:scrollbars="vertical"
+        android:textSize="20sp" />
 
     <LinearLayout
         android:id="@+id/chat_input_layout"
