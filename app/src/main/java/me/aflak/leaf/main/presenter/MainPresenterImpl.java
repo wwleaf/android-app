@@ -144,7 +144,6 @@ public class MainPresenterImpl implements MainPresenter {
     @Override
     public void onToggle(boolean isChecked) {
         debugEnabled = isChecked;
-        view.showMessage("hey");
     }
 
     private void broadcastGraph() {
