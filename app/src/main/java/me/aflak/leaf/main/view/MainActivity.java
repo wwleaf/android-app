@@ -2,17 +2,14 @@ package me.aflak.leaf.main.view;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -52,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().add(R.id.activity_main_chat_fragment, chatFragment).commit();
-        chatFragment.setListener(chatListener);
         presenter.onCreate(this);
     }
 
@@ -76,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @OnClick(R.id.connection_connect_button)
     void onConnect() {
-        int id = Integer.parseInt(userId.getText().toString());
+        String id = userId.getText().toString();
         presenter.onConnectClicked(id);
     }
 
@@ -153,16 +149,4 @@ public class MainActivity extends AppCompatActivity implements MainView {
     public void showId(byte id) {
         userId.setText(String.valueOf(id));
     }
-
-    private ChatFragment.OnChatListener chatListener = new ChatFragment.OnChatListener() {
-        @Override
-        public void onMessage(String message, int destId) {
-            presenter.onMessage(message, destId);
-        }
-
-        @Override
-        public void onToggle(boolean isChecked) {
-            presenter.onToggle(isChecked);
-        }
-    };
 }

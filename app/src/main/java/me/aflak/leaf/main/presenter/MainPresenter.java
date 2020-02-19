@@ -7,7 +7,7 @@ public interface MainPresenter {
     void onStart();
     void onPause();
     void onDestroy();
-    void onConnectClicked(int id);
-    void onMessage(String message, int destId);
+    void onConnectClicked(String id);
+    void onMessage(String message, String id);
     void onToggle(boolean isChecked);
 }

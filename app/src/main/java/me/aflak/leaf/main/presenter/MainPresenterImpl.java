@@ -10,6 +10,7 @@ import java.util.Set;
 
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
+import me.aflak.leaf.app.Utils;
 import me.aflak.leaf.arduino.Message;
 import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.interactor.MainInteractor;
@@ -104,30 +105,46 @@ public class MainPresenterImpl implements MainPresenter {
     }
 
     @Override
-    public void onConnectClicked(int id) {
-        if (interactor.isValidId(id)) {
-            interactor.setId(id);
-            arduino.open(device);
+    public void onConnectClicked(String id) {
+        if (Utils.isNumeric(id)) {
+            int sourceId = Integer.parseInt(id);
+            if (interactor.isValidId(sourceId)) {
+                interactor.setId(sourceId);
+                arduino.open(device);
+            } else {
+                view.showMessage("Invalid id");
+            }
         } else {
-            view.showMessage("Invalid id");
+            view.showMessage("Id must be a number");
         }
     }
 
     @Override
-    public void onMessage(String message, int destId) {
-        byte[] data = interactor.formatMessage(message.getBytes(), destId);
-        if (data != null) {
-            view.clearInput();
-            view.appendChatMessage("[" + interactor.getId() + "] -> [" + destId + "] [" + message + "]");
-            arduino.send(data);
+    public void onMessage(String message, String id) {
+        if (Utils.isNumeric(id)) {
+            int intId = Integer.parseInt(id);
+            if (interactor.isValidId(intId)) {
+                byte destId = (byte) intId;
+                byte[] data = interactor.formatMessage(message.getBytes(), destId);
+                if (data != null) {
+                    view.clearInput();
+                    view.appendChatMessage("[" + interactor.getId() + "] -> [" + destId + "] [" + message + "]");
+                    arduino.send(data);
+                } else {
+                    view.showMessage("Cannot reach id=" + id);
+                }
+            } else {
+                view.showMessage("Invalid destination id");
+            }
         } else {
-            view.showMessage("Invalid destination id");
+            view.showMessage("Destination id must be a number");
         }
     }
 
     @Override
     public void onToggle(boolean isChecked) {
         debugEnabled = isChecked;
+        view.showMessage("hey");
     }
 
     private void broadcastGraph() {

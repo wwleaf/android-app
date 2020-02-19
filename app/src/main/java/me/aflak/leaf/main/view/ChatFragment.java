@@ -20,13 +20,18 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import me.aflak.leaf.R;
+import me.aflak.leaf.main.presenter.MainPresenter;
 
 public class ChatFragment extends Fragment {
-    private OnChatListener listener;
+    private MainPresenter presenter;
 
     @BindView(R.id.chat_text) TextView chat;
     @BindView(R.id.chat_input) EditText input;
     @BindView(R.id.chat_destination) EditText destination;
+
+    public ChatFragment(MainPresenter presenter) {
+        this.presenter = presenter;
+    }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -36,20 +41,28 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+//        presenter.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+//        presenter.onViewStateRestored(savedInstanceState);
+    }
+
     @OnCheckedChanged(R.id.chat_toggle_debug)
     void onToggled(CompoundButton button, boolean isChecked) {
-        if (listener != null) {
-            listener.onToggle(isChecked);
-        }
+        presenter.onToggle(isChecked);
     }
 
     @OnClick(R.id.chat_send)
     void onSendMessage() {
-        if (listener != null) {
-            String message = input.getText().toString();
-            int destId = Integer.parseInt(destination.getText().toString());
-            listener.onMessage(message, destId);
-        }
+        String message = input.getText().toString();
+        String id = destination.getText().toString();
+        presenter.onMessage(message, id);
     }
 
     void appendMessage(String message) {
@@ -61,12 +74,7 @@ public class ChatFragment extends Fragment {
         Objects.requireNonNull(getActivity()).runOnUiThread(() -> input.setText(""));
     }
 
-    void setListener(OnChatListener listener) {
-        this.listener = listener;
-    }
-
-    interface OnChatListener {
-        void onMessage(String message, int destId);
-        void onToggle(boolean isChecked);
+    String getChatMessage() {
+        return chat.getText().toString();
     }
 }

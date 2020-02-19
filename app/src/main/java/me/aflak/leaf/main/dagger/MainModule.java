@@ -43,7 +43,7 @@ public class MainModule {
     }
 
     @Provides @Singleton
-    ChatFragment provideChatFragment() {
-        return new ChatFragment();
+    ChatFragment provideChatFragment(MainPresenter presenter) {
+        return new ChatFragment(presenter);
     }
 }
