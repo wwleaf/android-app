@@ -42,6 +42,14 @@ public class Edge {
 
     @Override
     public int hashCode() {
-        return Objects.hash(from, to);
+        Node refSmaller, refBigger;
+        if (from.getId() < to.getId()) {
+            refSmaller = from;
+            refBigger = to;
+        } else {
+            refSmaller = to;
+            refBigger = from;
+        }
+        return Objects.hash(refSmaller, refBigger);
     }
 }

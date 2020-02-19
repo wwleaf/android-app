@@ -4,6 +4,7 @@ import android.content.Context;
 import android.hardware.usb.UsbDevice;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -56,6 +57,7 @@ public class MainPresenterImpl implements MainPresenter {
 
             @Override
             public void onArduinoMessage(byte[] data) {
+                view.appendChatMessage("DEBUG: "+ Arrays.toString(data));
                 Message message = interactor.parseMessage(data);
                 if (message != null) {
                     interactor.updateGraph(message);
