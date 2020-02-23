@@ -20,7 +20,7 @@ public interface MainInteractor {
     boolean isTarget(Message message);
 
     // transmission
-    byte[] formatMessage(byte[] message, int destId);
+    byte[] formatMessage(byte[] message, byte destId);
     byte[] getGraphBroadcastMessage();
     byte[] getGraphForwardMessage(Message message);
     boolean shouldForwardGraph(Message message);

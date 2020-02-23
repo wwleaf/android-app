@@ -3,6 +3,7 @@ package me.aflak.leaf.main.interactor;
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +19,7 @@ import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.dagger.UserManager;
 
 public class MainInteractorImpl implements MainInteractor {
-    private final static byte DELIMITER = 124;
+    private final static byte DELIMITER = '\n';
     private final static byte BROADCAST_ID = 0;
     private final static byte BROADCAST_GRAPH_CODE = 127;
     public final static byte BROADCAST_MESSAGE_CODE = 126;
@@ -46,7 +47,7 @@ public class MainInteractorImpl implements MainInteractor {
     public void onCreate(Context context) {
         arduino = new Arduino(context);
         arduino.addVendorId(1659);
-//        arduino.setDelimiter(DELIMITER);
+        arduino.setDelimiter(DELIMITER);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class MainInteractorImpl implements MainInteractor {
 
             @Override
             public void onArduinoMessage(byte[] bytes) {
-                arduinoListener.onArduinoMessage(bytes);
+                arduinoListener.onArduinoMessage(Serial.parseMessage(bytes));
             }
 
             @Override
@@ -93,17 +94,8 @@ public class MainInteractorImpl implements MainInteractor {
 
     @Override
     public void send(byte[] message) {
-        arduino.send(message);
-    }
-
-    private static byte[] formatMessage(byte[] message) {
-        int length = message.length;
-        byte[] data = new byte[2 + length];
-        data[0] = (byte) length;
-        data[1] = (byte) (length >>> 8);
-//        data[data.length - 1] = DELIMITER;
-        System.arraycopy(message, 0, data, 2, length);
-        return data;
+        byte[] data = Serial.formatMessage(message);
+        arduino.send(ByteBuffer.allocate(message.length + 1).put(data).put(DELIMITER).array());
     }
 
     @Override
@@ -166,7 +158,7 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     @Override
-    public byte[] formatMessage(byte[] message, int destId) {
+    public byte[] formatMessage(byte[] message, byte destId) {
         if (destId == BROADCAST_ID) {
             return formatBroadcastMessage(message);
         }
@@ -174,14 +166,14 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     private byte[] formatBroadcastMessage(byte[] message) {
-        byte[] data = new byte[2 + message.length];
-        data[0] = BROADCAST_MESSAGE_CODE;
-        data[1] = userId;
-        System.arraycopy(message, 0, data, 2, message.length);
-        return formatMessage(data);
+        return ByteBuffer.allocate(2 + message.length)
+                .put(BROADCAST_MESSAGE_CODE)
+                .put(userId)
+                .put(message)
+                .array();
     }
 
-    private byte[] formatTargetedMessage(byte[] message, int destId) {
+    private byte[] formatTargetedMessage(byte[] message, byte destId) {
         List<Node> path = graph.shortestPath(selfNode, new Node(destId));
         if (path == null || path.isEmpty()) {
             return null;
@@ -196,7 +188,7 @@ public class MainInteractorImpl implements MainInteractor {
             data[pos++] = (byte) node.getId();
         }
         System.arraycopy(message, 0, data, pos, message.length);
-        return formatMessage(data);
+        return data;
     }
 
     @Override
@@ -211,7 +203,7 @@ public class MainInteractorImpl implements MainInteractor {
             message[pos++] = (byte) edge.getFrom().getId();
             message[pos++] = (byte) edge.getTo().getId();
         }
-        return formatMessage(message);
+        return message;
     }
 
     @Override
@@ -219,7 +211,7 @@ public class MainInteractorImpl implements MainInteractor {
         byte[] data = message.getData();
         byte[] newMessage = Arrays.copyOf(data, data.length);
         newMessage[1] = userId;
-        return formatMessage(newMessage);
+        return newMessage;
     }
 
     @Override
