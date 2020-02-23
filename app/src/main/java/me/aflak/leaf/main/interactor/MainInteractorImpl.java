@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
@@ -179,31 +180,32 @@ public class MainInteractorImpl implements MainInteractor {
             return null;
         }
 
-        byte[] data = new byte[3 + path.size() + message.length];
-        data[0] = TARGET_MESSAGE_CODE;
-        data[1] = userId;
-        data[2] = (byte) path.size();
-        int pos = 3;
-        for (Node node : path) {
-            data[pos++] = (byte) node.getId();
+        byte[] bytes = new byte[path.size()];
+        for (int i=0 ; i<path.size() ; i++) {
+            bytes[i] = (byte) path.get(i).getId();
         }
-        System.arraycopy(message, 0, data, pos, message.length);
-        return data;
+
+        return ByteBuffer.allocate(3 + path.size() + message.length)
+                .put(TARGET_MESSAGE_CODE)
+                .put(userId)
+                .put((byte) path.size())
+                .put(bytes)
+                .put(message)
+                .array();
     }
 
     @Override
     public byte[] getGraphBroadcastMessage() {
         Set<Edge> edges = graph.getEdges();
-        int byteCount = 2 * edges.size() + 2;
-        byte[] message = new byte[byteCount];
-        message[0] = BROADCAST_GRAPH_CODE;
-        message[1] = userId;
-        int pos = 2;
+        ByteBuffer buffer = ByteBuffer.allocate(2 + 2 * edges.size())
+                .put(BROADCAST_GRAPH_CODE)
+                .put(userId);
+
         for (Edge edge : edges) {
-            message[pos++] = (byte) edge.getFrom().getId();
-            message[pos++] = (byte) edge.getTo().getId();
+            buffer.put((byte) edge.getFrom().getId());
+            buffer.put((byte) edge.getTo().getId());
         }
-        return message;
+        return buffer.array();
     }
 
     @Override
