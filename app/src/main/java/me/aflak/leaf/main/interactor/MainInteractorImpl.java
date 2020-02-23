@@ -1,14 +1,16 @@
 package me.aflak.leaf.main.interactor;
 
-import android.util.Log;
+import android.content.Context;
+import android.hardware.usb.UsbDevice;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import me.aflak.leaf.arduino.Message;
-import me.aflak.leaf.arduino.Utils;
+import me.aflak.arduino.Arduino;
+import me.aflak.arduino.ArduinoListener;
+import me.aflak.leaf.model.Message;
 import me.aflak.leaf.graph.Edge;
 import me.aflak.leaf.graph.Graph;
 import me.aflak.leaf.graph.GraphManager;
@@ -16,6 +18,15 @@ import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.dagger.UserManager;
 
 public class MainInteractorImpl implements MainInteractor {
+    private final static byte DELIMITER = 124;
+    private final static byte BROADCAST_ID = 0;
+    private final static byte BROADCAST_GRAPH_CODE = 127;
+    public final static byte BROADCAST_MESSAGE_CODE = 126;
+    public final static byte TARGET_MESSAGE_CODE = 125;
+
+    private Arduino arduino;
+    private UsbDevice device;
+
     private GraphManager graphManager;
     private UserManager userManager;
 
@@ -29,6 +40,70 @@ public class MainInteractorImpl implements MainInteractor {
         this.userManager = userManager;
         this.graph = graphManager.load();
         this.userId = -1;
+    }
+
+    @Override
+    public void onCreate(Context context) {
+        arduino = new Arduino(context);
+        arduino.addVendorId(1659);
+        arduino.setDelimiter(DELIMITER);
+    }
+
+    @Override
+    public void onStart(ArduinoListener arduinoListener) {
+        arduino.setArduinoListener(new ArduinoListener() {
+            @Override
+            public void onArduinoAttached(UsbDevice device) {
+                MainInteractorImpl.this.device = device;
+                arduinoListener.onArduinoAttached(device);
+            }
+
+            @Override
+            public void onArduinoDetached() {
+                arduinoListener.onArduinoDetached();
+            }
+
+            @Override
+            public void onArduinoMessage(byte[] bytes) {
+                arduinoListener.onArduinoMessage(bytes);
+            }
+
+            @Override
+            public void onArduinoOpened() {
+                arduinoListener.onArduinoOpened();
+            }
+
+            @Override
+            public void onUsbPermissionDenied() {
+                arduinoListener.onUsbPermissionDenied();
+            }
+        });
+    }
+
+    @Override
+    public void openConnection() {
+        arduino.open(device);
+    }
+
+    @Override
+    public void closeConnection() {
+        arduino.unsetArduinoListener();
+        arduino.close();
+    }
+
+    @Override
+    public void send(byte[] message) {
+        arduino.send(message);
+    }
+
+    private static byte[] formatMessage(byte[] message) {
+        int length = message.length;
+        byte[] data = new byte[3 + length];
+        data[0] = (byte) length;
+        data[1] = (byte) (length >>> 8);
+        data[data.length - 1] = DELIMITER;
+        System.arraycopy(message, 0, data, 2, length);
+        return data;
     }
 
     @Override
@@ -48,9 +123,9 @@ public class MainInteractorImpl implements MainInteractor {
         byte sourceId = message.getSourceId();
         boolean hasChanged = false;
 
-        if (code == Message.BROADCAST_MESSAGE_CODE) {
+        if (code == BROADCAST_MESSAGE_CODE) {
             hasChanged = graph.connect(selfNode, new Node(sourceId));
-        } else if (code == Message.BROADCAST_GRAPH_CODE) {
+        } else if (code == BROADCAST_GRAPH_CODE) {
             Set<Edge> edges = new HashSet<>();
             edges.add(new Edge(selfNode, new Node(sourceId)));
             for (int i=0 ; i<data.length ; i+=2) {
@@ -59,7 +134,7 @@ public class MainInteractorImpl implements MainInteractor {
                 edges.add(new Edge(n1, n2));
             }
             hasChanged = graph.addEdges(edges);
-        } else if (code == Message.TARGET_MESSAGE_CODE) {
+        } else if (code == TARGET_MESSAGE_CODE) {
             Set<Edge> edges = new HashSet<>();
             edges.add(new Edge(selfNode, new Node(sourceId)));
             byte nodeCount = data[0];
@@ -92,7 +167,7 @@ public class MainInteractorImpl implements MainInteractor {
 
     @Override
     public byte[] formatMessage(byte[] message, int destId) {
-        if (destId == Message.BROADCAST_ID) {
+        if (destId == BROADCAST_ID) {
             return formatBroadcastMessage(message);
         }
         return formatTargetedMessage(message, destId);
@@ -100,10 +175,10 @@ public class MainInteractorImpl implements MainInteractor {
 
     private byte[] formatBroadcastMessage(byte[] message) {
         byte[] data = new byte[2 + message.length];
-        data[0] = Message.BROADCAST_MESSAGE_CODE;
+        data[0] = BROADCAST_MESSAGE_CODE;
         data[1] = userId;
         System.arraycopy(message, 0, data, 2, message.length);
-        return Utils.formatArduinoMessage(data);
+        return formatMessage(data);
     }
 
     private byte[] formatTargetedMessage(byte[] message, int destId) {
@@ -113,7 +188,7 @@ public class MainInteractorImpl implements MainInteractor {
         }
 
         byte[] data = new byte[3 + path.size() + message.length];
-        data[0] = Message.TARGET_MESSAGE_CODE;
+        data[0] = TARGET_MESSAGE_CODE;
         data[1] = userId;
         data[2] = (byte) path.size();
         int pos = 3;
@@ -121,7 +196,7 @@ public class MainInteractorImpl implements MainInteractor {
             data[pos++] = (byte) node.getId();
         }
         System.arraycopy(message, 0, data, pos, message.length);
-        return Utils.formatArduinoMessage(data);
+        return formatMessage(data);
     }
 
     @Override
@@ -129,14 +204,14 @@ public class MainInteractorImpl implements MainInteractor {
         Set<Edge> edges = graph.getEdges();
         int byteCount = 2 * edges.size() + 2;
         byte[] message = new byte[byteCount];
-        message[0] = Message.BROADCAST_GRAPH_CODE;
+        message[0] = BROADCAST_GRAPH_CODE;
         message[1] = userId;
         int pos = 2;
         for (Edge edge : edges) {
             message[pos++] = (byte) edge.getFrom().getId();
             message[pos++] = (byte) edge.getTo().getId();
         }
-        return Utils.formatArduinoMessage(message);
+        return formatMessage(message);
     }
 
     @Override
@@ -144,7 +219,7 @@ public class MainInteractorImpl implements MainInteractor {
         byte[] data = message.getData();
         byte[] newMessage = Arrays.copyOf(data, data.length);
         newMessage[1] = userId;
-        return Utils.formatArduinoMessage(newMessage);
+        return formatMessage(newMessage);
     }
 
     @Override

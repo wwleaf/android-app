@@ -1,8 +1,17 @@
 package me.aflak.leaf.main.interactor;
 
-import me.aflak.leaf.arduino.Message;
+import android.content.Context;
+
+import me.aflak.arduino.ArduinoListener;
+import me.aflak.leaf.model.Message;
 
 public interface MainInteractor {
+    void onCreate(Context context);
+    void onStart(ArduinoListener arduinoListener);
+    void openConnection();
+    void closeConnection();
+    void send(byte[] message);
+
     // reception
     Message parseMessage(byte[] message);
     void updateGraph(Message message);

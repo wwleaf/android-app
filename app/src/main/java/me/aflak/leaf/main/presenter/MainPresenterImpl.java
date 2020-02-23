@@ -8,10 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
 import me.aflak.leaf.app.Utils;
-import me.aflak.leaf.arduino.Message;
+import me.aflak.leaf.model.Message;
 import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.interactor.MainInteractor;
 import me.aflak.leaf.main.interactor.MainInteractorImpl;
@@ -20,8 +19,6 @@ import me.aflak.leaf.main.view.MainView;
 public class MainPresenterImpl implements MainPresenter {
     private MainView view;
     private MainInteractor interactor;
-    private Arduino arduino;
-    private UsbDevice device;
     private boolean debugEnabled;
 
     public MainPresenterImpl(MainView view, MainInteractor interactor) {
@@ -36,17 +33,16 @@ public class MainPresenterImpl implements MainPresenter {
         view.hideChat();
         view.showDisconnectedIcon();
 
-        arduino = new Arduino(context);
+        interactor.onCreate(context);
         interactor.setOnGraphListener(onGraphListener);
         view.showId(interactor.getId());
     }
 
     @Override
     public void onStart() {
-        arduino.setArduinoListener(new ArduinoListener() {
+        interactor.onStart(new ArduinoListener() {
             @Override
             public void onArduinoAttached(UsbDevice device) {
-                MainPresenterImpl.this.device = device;
                 view.showConnectedIcon();
                 view.showConnectButton();
             }
@@ -67,14 +63,14 @@ public class MainPresenterImpl implements MainPresenter {
                 Message message = interactor.parseMessage(data);
                 if (message != null) {
                     interactor.updateGraph(message);
-                    if (message.getCode() == Message.TARGET_MESSAGE_CODE) {
+                    if (message.getCode() == MainInteractorImpl.TARGET_MESSAGE_CODE) {
                         if (interactor.isTarget(message)) {
                             byte[] content = interactor.getDataFromTargetedMessage(message);
                             view.appendChatMessage("[" + message.getSourceId() + "] -> [" + interactor.getId() + "] [" + new String(content) + "]");
                         } else if (interactor.shouldForwardGraph(message)) {
-                            arduino.send(interactor.getGraphForwardMessage(message));
+                            interactor.send(interactor.getGraphForwardMessage(message));
                         }
-                    } else if (message.getCode() == Message.BROADCAST_MESSAGE_CODE) {
+                    } else if (message.getCode() == MainInteractorImpl.BROADCAST_MESSAGE_CODE) {
                         view.appendChatMessage("[" + message.getSourceId() + "] -> [0] [" + new String(message.getData()) + "]");
                     }
                 }
@@ -100,8 +96,7 @@ public class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void onDestroy() {
-        arduino.unsetArduinoListener();
-        arduino.close();
+        interactor.closeConnection();
     }
 
     @Override
@@ -110,7 +105,7 @@ public class MainPresenterImpl implements MainPresenter {
             int sourceId = Integer.parseInt(id);
             if (interactor.isValidId(sourceId)) {
                 interactor.setId(sourceId);
-                arduino.open(device);
+                interactor.openConnection();
             } else {
                 view.showMessage("Invalid id");
             }
@@ -129,7 +124,7 @@ public class MainPresenterImpl implements MainPresenter {
                 if (data != null) {
                     view.clearInput();
                     view.appendChatMessage("[" + interactor.getId() + "] -> [" + destId + "] [" + message + "]");
-                    arduino.send(data);
+                    interactor.send(data);
                 } else {
                     view.showMessage("Cannot reach id=" + id);
                 }
@@ -149,7 +144,7 @@ public class MainPresenterImpl implements MainPresenter {
     private void broadcastGraph() {
         byte[] message = interactor.getGraphBroadcastMessage();
         if (message != null) {
-            arduino.send(message);
+            interactor.send(message);
         }
     }
 
