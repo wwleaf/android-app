@@ -19,7 +19,7 @@ import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.dagger.UserManager;
 
 public class MainInteractorImpl implements MainInteractor {
-    private final static byte DELIMITER = '\n';
+    private final static byte DELIMITER = 124;
     private final static byte BROADCAST_ID = 0;
     private final static byte BROADCAST_GRAPH_CODE = 127;
     public final static byte BROADCAST_MESSAGE_CODE = 126;
@@ -95,7 +95,7 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public void send(byte[] message) {
         byte[] data = Serial.formatMessage(message);
-        arduino.send(ByteBuffer.allocate(message.length + 1).put(data).put(DELIMITER).array());
+        arduino.send(ByteBuffer.allocate(data.length + 1).put(data).put(DELIMITER).array());
     }
 
     @Override
