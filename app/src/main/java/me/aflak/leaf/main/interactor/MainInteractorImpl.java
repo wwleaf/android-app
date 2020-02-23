@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
@@ -104,8 +103,7 @@ public class MainInteractorImpl implements MainInteractor {
         if (message.length < 2) {
             return null;
         }
-        byte[] data = new byte[message.length - 2];
-        System.arraycopy(message, 2, data, 0, message.length - 2);
+        byte[] data = ByteBuffer.wrap(message, 2, message.length - 2).array();
         return new Message(message[0], message[1], data);
     }
 
@@ -146,9 +144,7 @@ public class MainInteractorImpl implements MainInteractor {
     public byte[] getDataFromTargetedMessage(Message message) {
         byte[] data = message.getData();
         int startIndex = data[0] + 1;
-        byte[] content = new byte[data.length - startIndex];
-        System.arraycopy(data, startIndex, content, 0, content.length);
-        return content;
+        return ByteBuffer.wrap(data, startIndex, data.length - startIndex).array();
     }
 
     @Override
