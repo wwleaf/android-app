@@ -45,7 +45,7 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public void onCreate(Context context) {
         arduino = new Arduino(context);
-//        arduino.addVendorId(1659);
+        arduino.addVendorId(1659);
 //        arduino.setDelimiter(DELIMITER);
     }
 
