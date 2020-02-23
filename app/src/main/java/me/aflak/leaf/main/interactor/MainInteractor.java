@@ -27,6 +27,7 @@ public interface MainInteractor {
     void setId(int id);
     byte getId();
     boolean isValidId(int id);
+    boolean isValidDestinationId(int id);
     void saveGraph();
     void setOnGraphListener(MainInteractorImpl.OnGraphListener listener);
 }

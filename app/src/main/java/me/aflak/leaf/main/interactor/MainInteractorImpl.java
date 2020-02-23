@@ -46,7 +46,7 @@ public class MainInteractorImpl implements MainInteractor {
     public void onCreate(Context context) {
         arduino = new Arduino(context);
         arduino.addVendorId(1659);
-        arduino.setDelimiter(DELIMITER);
+//        arduino.setDelimiter(DELIMITER);
     }
 
     @Override
@@ -98,10 +98,10 @@ public class MainInteractorImpl implements MainInteractor {
 
     private static byte[] formatMessage(byte[] message) {
         int length = message.length;
-        byte[] data = new byte[3 + length];
+        byte[] data = new byte[2 + length];
         data[0] = (byte) length;
         data[1] = (byte) (length >>> 8);
-        data[data.length - 1] = DELIMITER;
+//        data[data.length - 1] = DELIMITER;
         System.arraycopy(message, 0, data, 2, length);
         return data;
     }
@@ -256,6 +256,11 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public boolean isValidId(int id) {
         return id > 0 && id <= 127;
+    }
+
+    @Override
+    public boolean isValidDestinationId(int id) {
+        return id >= 0 && id <= 127;
     }
 
     @Override

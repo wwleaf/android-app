@@ -118,7 +118,7 @@ public class MainPresenterImpl implements MainPresenter {
     public void onMessage(String message, String id) {
         if (Utils.isNumeric(id)) {
             int intId = Integer.parseInt(id);
-            if (interactor.isValidId(intId)) {
+            if (interactor.isValidDestinationId(intId)) {
                 byte destId = (byte) intId;
                 byte[] data = interactor.formatMessage(message.getBytes(), destId);
                 if (data != null) {
