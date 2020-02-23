@@ -6,6 +6,7 @@ import me.aflak.arduino.ArduinoListener;
 import me.aflak.leaf.model.Message;
 
 public interface MainInteractor {
+    // device
     void onCreate(Context context);
     void onStart(ArduinoListener arduinoListener);
     void openConnection();
@@ -24,10 +25,13 @@ public interface MainInteractor {
     byte[] getGraphForwardMessage(Message message);
     boolean shouldForwardGraph(Message message);
 
+    // id related
     void setId(int id);
     byte getId();
     boolean isValidId(int id);
     boolean isValidDestinationId(int id);
+
+    // graph
     void saveGraph();
     void setOnGraphListener(MainInteractorImpl.OnGraphListener listener);
 }
