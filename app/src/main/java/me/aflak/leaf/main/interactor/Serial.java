@@ -1,6 +1,7 @@
 package me.aflak.leaf.main.interactor;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 class Serial {
     static byte[] formatMessage(byte[] message) {
@@ -12,7 +13,7 @@ class Serial {
         if (message.length > 2) {
             int length = ByteBuffer.wrap(message, 0, 2).get();
             if (message.length - 2 == length) {
-                return ByteBuffer.wrap(message, 2, message.length - 2).array();
+                return Arrays.copyOfRange(message, 2, message.length);
             }
         }
         return null;

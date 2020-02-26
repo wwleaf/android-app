@@ -2,6 +2,7 @@ package me.aflak.leaf.main.interactor;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.dagger.UserManager;
 
 public class MainInteractorImpl implements MainInteractor {
+    private final static int VENDOR_ID = 0x10C4;
     private final static byte DELIMITER = 124;
     private final static byte BROADCAST_ID = 0;
     private final static byte BROADCAST_GRAPH_CODE = 127;
@@ -46,7 +48,7 @@ public class MainInteractorImpl implements MainInteractor {
     @Override
     public void onCreate(Context context) {
         arduino = new Arduino(context);
-        arduino.addVendorId(1659);
+        arduino.addVendorId(VENDOR_ID);
         arduino.setDelimiter(DELIMITER);
     }
 
@@ -103,7 +105,7 @@ public class MainInteractorImpl implements MainInteractor {
         if (message.length < 2) {
             return null;
         }
-        byte[] data = ByteBuffer.wrap(message, 2, message.length - 2).array();
+        byte[] data = Arrays.copyOfRange(message, 2, message.length);
         return new Message(message[0], message[1], data);
     }
 
@@ -144,7 +146,7 @@ public class MainInteractorImpl implements MainInteractor {
     public byte[] getDataFromTargetedMessage(Message message) {
         byte[] data = message.getData();
         int startIndex = data[0] + 1;
-        return ByteBuffer.wrap(data, startIndex, data.length - startIndex).array();
+        return Arrays.copyOfRange(data, startIndex, data.length);
     }
 
     @Override
