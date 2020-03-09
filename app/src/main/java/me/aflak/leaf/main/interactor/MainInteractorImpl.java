@@ -2,7 +2,6 @@ package me.aflak.leaf.main.interactor;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
-import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -208,10 +207,13 @@ public class MainInteractorImpl implements MainInteractor {
 
     @Override
     public byte[] getGraphForwardMessage(Message message) {
+        byte code = message.getCode();
         byte[] data = message.getData();
-        byte[] newMessage = Arrays.copyOf(data, data.length);
-        newMessage[1] = userId;
-        return newMessage;
+        return ByteBuffer.allocate(2 + data.length)
+            .put(code)
+            .put(userId)
+            .put(data)
+            .array();
     }
 
     @Override
