@@ -66,7 +66,7 @@ public class MainPresenterImpl implements MainPresenter {
                     if (message.getCode() == MainInteractorImpl.TARGET_MESSAGE_CODE) {
                         if (interactor.isTarget(message)) {
                             byte[] content = interactor.getDataFromTargetedMessage(message);
-                            view.appendChatMessage("[" + message.getSourceId() + "] -> [" + interactor.getId() + "] [" + new String(content) + "]");
+                            view.appendChatMessage("[" + message.getData()[1] + "] -> [" + interactor.getId() + "] [" + new String(content) + "]");
                         } else if (interactor.shouldForwardGraph(message)) {
                             interactor.send(interactor.getGraphForwardMessage(message));
                         }
