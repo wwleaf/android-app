@@ -207,10 +207,9 @@ public class MainInteractorImpl implements MainInteractor {
 
     @Override
     public byte[] getGraphForwardMessage(Message message) {
-        byte code = message.getCode();
         byte[] data = message.getData();
         return ByteBuffer.allocate(2 + data.length)
-            .put(code)
+            .put(BROADCAST_GRAPH_CODE)
             .put(userId)
             .put(data)
             .array();
