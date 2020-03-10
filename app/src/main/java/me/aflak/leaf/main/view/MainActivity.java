@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
             destinations.add(new Destination(p.first, p.second));
         }
         chatFragment.showDestinations(destinations);
-        Toast.makeText(this, "New users online!", Toast.LENGTH_SHORT).show();
     }
 
     @Override

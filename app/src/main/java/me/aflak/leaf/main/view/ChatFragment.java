@@ -83,8 +83,10 @@ public class ChatFragment extends Fragment {
     }
 
     void showDestinations(List<Destination> destinations) {
-        destinationAdapter.clear();
-        destinationAdapter.addAll(destinations);
-        destinationAdapter.notifyDataSetChanged();
+        Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+            destinationAdapter.clear();
+            destinationAdapter.addAll(destinations);
+            destinationAdapter.notifyDataSetChanged();
+        });
     }
 }
