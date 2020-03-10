@@ -5,14 +5,17 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -21,13 +24,15 @@ import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import me.aflak.leaf.R;
 import me.aflak.leaf.main.presenter.MainPresenter;
+import me.aflak.leaf.main.entities.Destination;
 
 public class ChatFragment extends Fragment {
     private MainPresenter presenter;
+    private ArrayAdapter<Destination> destinationAdapter;
 
     @BindView(R.id.chat_text) TextView chat;
     @BindView(R.id.chat_input) EditText input;
-    @BindView(R.id.chat_destination) EditText destination;
+    @BindView(R.id.chat_destination) Spinner destinations;
 
     public ChatFragment(MainPresenter presenter) {
         this.presenter = presenter;
@@ -38,6 +43,8 @@ public class ChatFragment extends Fragment {
         View view = inflater.inflate(R.layout.chat, container, false);
         ButterKnife.bind(this, view);
         chat.setMovementMethod(new ScrollingMovementMethod());
+        destinationAdapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), android.R.layout.simple_spinner_dropdown_item);
+        destinations.setAdapter(destinationAdapter);
         return view;
     }
 
@@ -61,7 +68,8 @@ public class ChatFragment extends Fragment {
     @OnClick(R.id.chat_send)
     void onSendMessage() {
         String message = input.getText().toString();
-        String id = destination.getText().toString();
+        Destination destination = (Destination) destinations.getSelectedItem();
+        String id = String.valueOf(destination.getId());
         presenter.onMessage(message, id);
     }
 
@@ -74,7 +82,9 @@ public class ChatFragment extends Fragment {
         Objects.requireNonNull(getActivity()).runOnUiThread(() -> input.setText(""));
     }
 
-    String getChatMessage() {
-        return chat.getText().toString();
+    void showDestinations(List<Destination> destinations) {
+        destinationAdapter.clear();
+        destinationAdapter.addAll(destinations);
+        destinationAdapter.notifyDataSetChanged();
     }
 }

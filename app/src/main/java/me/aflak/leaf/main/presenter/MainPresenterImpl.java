@@ -2,15 +2,17 @@ package me.aflak.leaf.main.presenter;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
+import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import me.aflak.arduino.ArduinoListener;
 import me.aflak.leaf.app.Utils;
-import me.aflak.leaf.model.Message;
+import me.aflak.leaf.models.Message;
 import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.main.interactor.MainInteractor;
 import me.aflak.leaf.main.interactor.MainInteractorImpl;
@@ -79,6 +81,7 @@ public class MainPresenterImpl implements MainPresenter {
             @Override
             public void onArduinoOpened() {
                 view.showChat();
+                view.showUsers(Collections.singletonList(Pair.create("0 (broadcast)", (byte) 0)));
                 me.aflak.leaf.app.Utils.executeNTimes(5, 1000 * 10, () -> broadcastGraph());
             }
 
@@ -151,9 +154,10 @@ public class MainPresenterImpl implements MainPresenter {
     private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {
         @Override
         public void onGraphChanged(Set<Node> nodes) {
-            List<Integer> ids = new ArrayList<>();
+            List<Pair<String, Byte>> ids = new ArrayList<>();
+            ids.add(Pair.create("0 (broadcast)", (byte) 0));
             for (Node n : nodes) {
-                ids.add(n.getId());
+                ids.add(Pair.create(String.valueOf(n.getId()), (byte) n.getId()));
             }
             view.showUsers(ids);
             broadcastGraph();

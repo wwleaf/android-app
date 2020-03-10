@@ -1,4 +1,4 @@
-package me.aflak.leaf.model;
+package me.aflak.leaf.models;
 
 public class Message {
     private byte code;

@@ -3,7 +3,7 @@ package me.aflak.leaf.main.interactor;
 import android.content.Context;
 
 import me.aflak.arduino.ArduinoListener;
-import me.aflak.leaf.model.Message;
+import me.aflak.leaf.models.Message;
 
 public interface MainInteractor {
     // device

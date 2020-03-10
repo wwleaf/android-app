@@ -17,7 +17,7 @@
         android:id="@+id/chat_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/chat_input_layout"
+        android:layout_above="@id/chat_destination_layout"
         android:layout_below="@id/chat_toggle_debug"
         android:layout_marginBottom="-1dp"
         android:gravity="bottom"
@@ -26,11 +26,41 @@
         android:textSize="20sp" />
 
     <LinearLayout
+        android:id="@+id/chat_destination_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_above="@id/chat_input_layout"
+        android:gravity="center_vertical"
+        android:paddingTop="16dp"
+        android:paddingBottom="4dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Destination:"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
+
+        <Spinner
+            android:id="@+id/chat_destination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/chat_input_layout"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="70dp"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:layout_alignParentBottom="true">
 
         <EditText
@@ -39,20 +69,9 @@
             android:layout_height="match_parent"
             android:layout_weight="6"
             android:padding="10dip"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/rounded"
             android:hint="@string/chat_input"/>
-
-        <EditText
-            android:id="@+id/chat_destination"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:padding="10dip"
-            android:background="@drawable/rounded"
-            android:hint="@string/chat_destination_hint"
-            android:text="@string/chat_destination_value"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"/>
 
         <ImageButton
             android:id="@+id/chat_send"

@@ -11,7 +11,7 @@ import java.util.Set;
 
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
-import me.aflak.leaf.model.Message;
+import me.aflak.leaf.models.Message;
 import me.aflak.leaf.graph.Edge;
 import me.aflak.leaf.graph.Graph;
 import me.aflak.leaf.graph.GraphManager;

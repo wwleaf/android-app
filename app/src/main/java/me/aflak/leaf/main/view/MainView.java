@@ -1,5 +1,7 @@
 package me.aflak.leaf.main.view;
 
+import android.util.Pair;
+
 import java.util.List;
 
 public interface MainView {
@@ -11,7 +13,7 @@ public interface MainView {
     void showChat();
     void hideChat();
     void appendChatMessage(String message);
-    void showUsers(List<Integer> users);
+    void showUsers(List<Pair<String, Byte>> users);
     void showId(byte id);
     void clearInput();
 }

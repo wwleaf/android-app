@@ -6,11 +6,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -24,6 +27,7 @@ import me.aflak.leaf.graph.GraphModule;
 import me.aflak.leaf.main.dagger.DaggerMainComponent;
 import me.aflak.leaf.main.dagger.MainModule;
 import me.aflak.leaf.main.presenter.MainPresenter;
+import me.aflak.leaf.main.entities.Destination;
 
 public class MainActivity extends AppCompatActivity implements MainView {
     @BindView(R.id.connection_parent) LinearLayout connectionLayout;
@@ -132,17 +136,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void showUsers(List<Integer> users) {
-        StringBuilder builder = new StringBuilder();
-        for (int i=0 ; i<users.size() ; i++) {
-            builder.append("[");
-            builder.append(users.get(i));
-            builder.append("] online");
-            if (i < users.size() - 1) {
-                builder.append("\n");
-            }
+    public void showUsers(List<Pair<String, Byte>> users) {
+        List<Destination> destinations = new ArrayList<>();
+        for (Pair<String, Byte> p : users) {
+            destinations.add(new Destination(p.first, p.second));
         }
-        chatFragment.appendMessage(builder.toString());
+        chatFragment.showDestinations(destinations);
+        Toast.makeText(this, "New users online!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
