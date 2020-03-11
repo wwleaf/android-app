@@ -2,7 +2,10 @@ package me.aflak.leaf.main.interactor;
 
 import android.content.Context;
 
+import java.util.Set;
+
 import me.aflak.arduino.ArduinoListener;
+import me.aflak.leaf.graph.Node;
 import me.aflak.leaf.models.Message;
 
 public interface MainInteractor {
@@ -34,4 +37,5 @@ public interface MainInteractor {
     // graph
     void saveGraph();
     void setOnGraphListener(MainInteractorImpl.OnGraphListener listener);
+    Set<Node> getNodes();
 }

@@ -6,7 +6,6 @@ import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +37,7 @@ public class MainPresenterImpl implements MainPresenter {
         interactor.onCreate(context);
         interactor.setOnGraphListener(onGraphListener);
         view.showId(interactor.getId());
+        showUsers(interactor.getNodes());
     }
 
     @Override
@@ -81,7 +81,6 @@ public class MainPresenterImpl implements MainPresenter {
             @Override
             public void onArduinoOpened() {
                 view.showChat();
-                view.showUsers(Collections.singletonList(Pair.create("0 (broadcast)", (byte) 0)));
                 me.aflak.leaf.app.Utils.executeNTimes(5, 1000 * 10, () -> broadcastGraph());
             }
 
@@ -151,16 +150,22 @@ public class MainPresenterImpl implements MainPresenter {
         }
     }
 
-    private MainInteractorImpl.OnGraphListener onGraphListener = new MainInteractorImpl.OnGraphListener() {
-        @Override
-        public void onGraphChanged(Set<Node> nodes) {
-            List<Pair<String, Byte>> ids = new ArrayList<>();
-            ids.add(Pair.create("0 (broadcast)", (byte) 0));
-            for (Node n : nodes) {
-                ids.add(Pair.create(String.valueOf(n.getId()), (byte) n.getId()));
+    private void showUsers(Set<Node> nodes) {
+        List<Pair<String, Byte>> users = new ArrayList<>();
+        users.add(Pair.create("0 (broadcast)", (byte) 0));
+
+        byte selfId = interactor.getId();
+        for (Node n : nodes) {
+            if (n.getId() != selfId) {
+                users.add(Pair.create(String.valueOf(n.getId()), (byte) n.getId()));
             }
-            view.showUsers(ids);
-            broadcastGraph();
         }
+
+        view.showUsers(users);
+    }
+
+    private MainInteractorImpl.OnGraphListener onGraphListener = nodes -> {
+        showUsers(nodes);
+        broadcastGraph();
     };
 }

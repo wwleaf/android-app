@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -52,8 +53,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 .build().inject(this);
 
         fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.activity_main_chat_fragment, chatFragment).commit();
-        presenter.onCreate(this);
+        FragmentTransaction transaction = fragmentManager.beginTransaction().add(R.id.activity_main_chat_fragment, chatFragment);
+        transaction.runOnCommit(() -> presenter.onCreate(MainActivity.this));
+        transaction.commit();
     }
 
     @Override
@@ -127,12 +129,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void appendChatMessage(String message) {
-        chatFragment.appendMessage(message);
+        runOnUiThread(() -> chatFragment.appendMessage(message));
     }
 
     @Override
     public void clearInput() {
-        chatFragment.clearInput();
+        runOnUiThread(() -> chatFragment.clearInput());
     }
 
     @Override
@@ -141,11 +143,16 @@ public class MainActivity extends AppCompatActivity implements MainView {
         for (Pair<String, Byte> p : users) {
             destinations.add(new Destination(p.first, p.second));
         }
-        chatFragment.showDestinations(destinations);
+        runOnUiThread(() -> chatFragment.showDestinations(destinations));
     }
 
     @Override
     public void showId(byte id) {
         userId.setText(String.valueOf(id));
+    }
+
+    @Override
+    public void showToast(String message) {
+        runOnUiThread(() -> Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show());
     }
 }

@@ -2,6 +2,7 @@ package me.aflak.leaf.graph;
 
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class Edge {
@@ -51,5 +52,11 @@ public class Edge {
             refBigger = from;
         }
         return Objects.hash(refSmaller, refBigger);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return from.getId()+":"+to.getId();
     }
 }

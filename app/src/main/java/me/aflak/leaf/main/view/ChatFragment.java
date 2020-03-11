@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,7 +42,7 @@ public class ChatFragment extends Fragment {
         View view = inflater.inflate(R.layout.chat, container, false);
         ButterKnife.bind(this, view);
         chat.setMovementMethod(new ScrollingMovementMethod());
-        destinationAdapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), android.R.layout.simple_spinner_dropdown_item);
+        destinationAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item);
         destinations.setAdapter(destinationAdapter);
         return view;
     }
@@ -74,19 +73,17 @@ public class ChatFragment extends Fragment {
     }
 
     void appendMessage(String message) {
-        final String text = chat.getText().toString() + "\n" + message;
-        Objects.requireNonNull(getActivity()).runOnUiThread(() -> chat.setText(text));
+        String text = chat.getText().toString() + "\n" + message;
+        chat.setText(text);
     }
 
     void clearInput() {
-        Objects.requireNonNull(getActivity()).runOnUiThread(() -> input.setText(""));
+        input.setText("");
     }
 
     void showDestinations(List<Destination> destinations) {
-        Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
-            destinationAdapter.clear();
-            destinationAdapter.addAll(destinations);
-            destinationAdapter.notifyDataSetChanged();
-        });
+        destinationAdapter.clear();
+        destinationAdapter.addAll(destinations);
+        destinationAdapter.notifyDataSetChanged();
     }
 }

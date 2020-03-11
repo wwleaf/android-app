@@ -16,4 +16,5 @@ public interface MainView {
     void showUsers(List<Pair<String, Byte>> users);
     void showId(byte id);
     void clearInput();
+    void showToast(String message);
 }

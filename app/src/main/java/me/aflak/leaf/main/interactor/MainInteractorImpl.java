@@ -266,6 +266,11 @@ public class MainInteractorImpl implements MainInteractor {
         this.listener = listener;
     }
 
+    @Override
+    public Set<Node> getNodes() {
+        return graph.getNodes();
+    }
+
     public interface OnGraphListener {
         void onGraphChanged(Set<Node> nodes);
     }
